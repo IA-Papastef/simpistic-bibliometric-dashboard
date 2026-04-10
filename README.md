@@ -30,7 +30,7 @@ Researchers often need to track how frequently specific terms appear in academic
 
 ### Option 2: Clone the Repository
 ```bash
-git clone https://github.com/YOUR-USERNAME/bibliometric-dashboard.git
+git clone https://github.com/IA-Papastef/simpistic-bibliometric-dashboard.git
 cd bibliometric-dashboard
 # Open in browser — no build step needed
 firefox index.html
@@ -41,7 +41,7 @@ xdg-open index.html
 ```
 
 ### Option 3: GitHub Pages
-This project works out-of-the-box with [GitHub Pages](https://pages.github.com/). Enable it in your repository settings and access the dashboard at `https://YOUR-USERNAME.github.io/bibliometric-dashboard/`.
+This project works out-of-the-box with [GitHub Pages](https://pages.github.com/). Enable it in your repository settings and access the dashboard at `https://IA-Papastef.github.io/simpistic-bibliometric-dashboard/`.
 
 ## 📖 How to Use
 
