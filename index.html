@@ -11,20 +11,15 @@
   <meta property="og:type" content="website">
   <title>Bibliometric Research Dashboard</title>
 
-  <!-- Chart.js (CDN with SRI) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
     integrity="sha512-CQBSSt0Bm2MlDJMYbBFNUEoMBCpgYJ6Clz0HIEP4VIBfPz5WFMiyYAMBMZB3JMFhjGTaIcSQrYbUvYJo5SDNQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    
-       Variables
-       
     :root {
       --color-bg: #f5f0e8;
       --color-bg-dark: #2a2520;
@@ -42,29 +37,14 @@
       --color-info-border: #e8d9a8;
       --color-success: #3e8a7e;
       --color-code-bg: #f0ebe0;
-
-      --term-1: #c45d3e;
-      --term-2: #3e8a7e;
-      --term-3: #5b6abf;
-      --journal-1: #c45d3e;
-      --journal-2: #3e8a7e;
-      --journal-3: #5b6abf;
-      --journal-4: #d4a03c;
-      --journal-5: #8b5e83;
-
       --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
       --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
       --radius-sm: 4px;
       --radius-md: 8px;
       --radius-lg: 12px;
       --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
-      --transition-fast: 0.2s ease;
     }
 
-    
-       Reset
-       
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -74,228 +54,95 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
+    :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
-    
-       Focus styles
-       
-    :focus-visible {
-      outline: 2px solid var(--color-accent);
-      outline-offset: 2px;
-    }
-
-    
-       Header
-       
     .header {
       background: var(--color-bg-dark);
       padding: 32px 36px 0;
       color: var(--color-text-inverse);
     }
     .header__label {
-      font-size: 11px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      margin-bottom: 8px;
+      font-size: 11px; font-family: var(--font-sans); font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--color-accent); margin-bottom: 8px;
     }
-    .header__title {
-      font-size: clamp(22px, 4vw, 28px);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-    .header__subtitle {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      color: var(--color-text-light);
-      margin-bottom: 20px;
-    }
-    .header__actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    .header__title { font-size: clamp(22px, 4vw, 28px); font-weight: 700; line-height: 1.2; margin-bottom: 4px; }
+    .header__subtitle { font-family: var(--font-sans); font-size: 14px; color: var(--color-text-light); margin-bottom: 20px; }
 
-    
-       Tabs
-       
     .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-bg-dark-alt); flex-wrap: wrap; }
     .tabs__btn {
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      background: transparent;
-      color: var(--color-text-muted);
-      transition: color var(--transition-fast);
-      border-bottom: 2px solid transparent;
+      padding: 10px 20px; border: none; cursor: pointer; font-family: var(--font-sans);
+      font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+      background: transparent; color: var(--color-text-muted); border-bottom: 2px solid transparent;
+      transition: color 0.2s;
     }
     .tabs__btn--active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
     .tabs__btn:hover { color: var(--color-text-inverse); }
 
-    
-       Layout
-       
     .content { padding: 28px 36px; max-width: 1140px; margin: 0 auto; }
+
     @media (max-width: 640px) {
       .header { padding: 20px 16px 0; }
       .content { padding: 16px; }
       .tabs__btn { padding: 8px 12px; font-size: 11px; }
     }
 
-    
-       Cards
-       
     .card {
-      background: var(--color-surface);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      box-shadow: var(--shadow-card);
-      margin-bottom: 20px;
+      background: var(--color-surface); border-radius: var(--radius-lg);
+      padding: 28px; box-shadow: var(--shadow-card); margin-bottom: 20px;
     }
-    .card__title {
-      font-family: var(--font-serif);
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
+    .card__title { font-family: var(--font-serif); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     .card__subtitle {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      color: var(--color-text-muted);
-      margin-bottom: 24px;
-      line-height: 1.5;
+      font-family: var(--font-sans); font-size: 13px; color: var(--color-text-muted);
+      margin-bottom: 24px; line-height: 1.5;
     }
 
-    
-       Info box
-       
     .info-box {
-      background: var(--color-info-bg);
-      border: 1px solid var(--color-info-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 24px;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      line-height: 1.6;
+      background: var(--color-info-bg); border: 1px solid var(--color-info-border);
+      border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px;
+      font-family: var(--font-sans); font-size: 13px; line-height: 1.6;
     }
     .info-box strong { color: var(--color-accent); }
 
-    
-       Status bar
-       
     .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-sans);
-      font-size: 11px;
-      color: var(--color-text-light);
-      padding: 8px 0;
+      display: flex; align-items: center; gap: 12px; font-family: var(--font-sans);
+      font-size: 11px; color: var(--color-text-light); padding: 8px 0;
     }
-    .status-bar__dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--color-success);
-      display: inline-block;
-    }
+    .status-bar__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); }
 
-    
-       Chips
-       
     .chip {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      margin-right: 6px;
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-family: var(--font-sans); font-weight: 600; margin-right: 6px;
     }
 
-    
-       Tables
-       
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { border-collapse: collapse; width: 100%; }
-    th, td {
-      padding: 8px 10px;
-      text-align: center;
-      font-size: 12px;
-      font-family: var(--font-sans);
-    }
+    th, td { padding: 8px 10px; text-align: center; font-size: 12px; font-family: var(--font-sans); }
     th {
-      background: var(--color-border);
-      font-weight: 600;
-      color: #5a5549;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-size: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      background: var(--color-border); font-weight: 600; color: #5a5549;
+      text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; position: sticky; top: 0; z-index: 1;
     }
     td { border-bottom: 1px solid var(--color-border); }
     tr:hover td { background: rgba(196, 93, 62, 0.04); }
 
-    
-       Inputs
-       
     .data-input {
-      width: 64px;
-      padding: 4px 6px;
-      border: 1px solid var(--color-border-dark);
-      border-radius: var(--radius-sm);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      text-align: center;
-      background: var(--color-surface);
-      transition: border-color var(--transition-fast);
+      width: 64px; padding: 4px 6px; border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-sm); font-family: var(--font-sans); font-size: 12px;
+      text-align: center; background: var(--color-surface);
     }
-    .data-input:focus {
-      outline: none;
-      border-color: var(--color-accent);
-      box-shadow: 0 0 0 2px rgba(196, 93, 62, 0.15);
-    }
+    .data-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 2px rgba(196,93,62,0.15); }
     .data-input--sm { width: 52px; }
 
-    
-       Buttons
-       
     .link-btn {
-      display: inline-block;
-      padding: 2px 8px;
-      font-size: 10px;
-      font-family: var(--font-sans);
-      background: var(--color-accent);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 3px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      transition: background var(--transition-fast);
+      display: inline-block; padding: 2px 8px; font-size: 10px; font-family: var(--font-sans);
+      background: var(--color-accent); color: #fff; text-decoration: none; border-radius: 3px;
+      font-weight: 600; letter-spacing: 0.3px;
     }
     .link-btn:hover { background: var(--color-accent-hover); }
     .link-btn--lg { padding: 8px 16px; font-size: 12px; border-radius: 6px; }
 
     .btn {
-      padding: 8px 18px;
-      border: none;
-      border-radius: 6px;
-      font-family: var(--font-sans);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background var(--transition-fast);
+      padding: 8px 18px; border: none; border-radius: 6px; font-family: var(--font-sans);
+      font-size: 12px; font-weight: 600; cursor: pointer;
     }
     .btn--primary { background: var(--color-bg-dark); color: var(--color-text-inverse); }
     .btn--primary:hover { background: var(--color-bg-dark-alt); }
@@ -303,70 +150,31 @@
     .btn--danger:hover { background: #c9302c; }
     .btn--outline { background: transparent; border: 1px solid var(--color-border-dark); color: var(--color-text); }
     .btn--outline:hover { background: var(--color-border); }
-
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
-    
-       Charts
-       
     .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
-    
-       Journal cells
-       
-    .journal-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
+    .journal-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 
-    
-       Prose
-       
     .prose { font-family: var(--font-sans); font-size: 14px; line-height: 1.8; color: #3a3530; }
     .prose p { margin-bottom: 16px; }
     .prose ul { padding-left: 20px; margin-top: 8px; }
     .prose li { margin-bottom: 4px; }
     .prose a { color: var(--color-accent); }
-    .prose code {
-      background: var(--color-code-bg);
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 12px;
-    }
+    .prose code { background: var(--color-code-bg); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
 
-    
-       Tab panels
-       
     .tab-panel { display: none; }
     .tab-panel--active { display: block; }
 
-    
-       Toast
-       
     .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--color-bg-dark);
-      color: var(--color-text-inverse);
-      padding: 12px 20px;
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: 13px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 1000;
+      position: fixed; bottom: 24px; right: 24px; background: var(--color-bg-dark);
+      color: var(--color-text-inverse); padding: 12px 20px; border-radius: var(--radius-md);
+      font-family: var(--font-sans); font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;
     }
     .toast--visible { transform: translateY(0); opacity: 1; }
 
-    
-       Print
-       
     @media print {
       .header, .tabs, .info-box, .link-btn, .btn, .data-input, .status-bar { display: none !important; }
       .tab-panel { display: block !important; }
@@ -377,54 +185,37 @@
 </head>
 <body>
 
-       Header
   <header class="header" role="banner">
     <div class="header__label">Bibliometric Research Dashboard</div>
-    <h1 class="header__title" id="app-title">Term Frequency in Academic Journals</h1>
-    <p class="header__subtitle">
-      Track and visualize keyword occurrence across journals &amp; Google Scholar
-    </p>
-    <div class="header__actions">
-      <nav class="tabs" role="tablist" aria-label="Dashboard sections">
-        <button class="tabs__btn tabs__btn--active" role="tab" aria-selected="true"
-          aria-controls="tab-overview" id="btn-overview" onclick="switchTab('overview')">
-          Overview &amp; Charts
-        </button>
-        <button class="tabs__btn" role="tab" aria-selected="false"
-          aria-controls="tab-scholar" id="btn-scholar" onclick="switchTab('scholar')">
-          Google Scholar Data
-        </button>
-        <button class="tabs__btn" role="tab" aria-selected="false"
-          aria-controls="tab-journals" id="btn-journals" onclick="switchTab('journals')">
-          Journal Data Entry
-        </button>
-        <button class="tabs__btn" role="tab" aria-selected="false"
-          aria-controls="tab-settings" id="btn-settings" onclick="switchTab('settings')">
-          Settings
-        </button>
-        <button class="tabs__btn" role="tab" aria-selected="false"
-          aria-controls="tab-method" id="btn-method" onclick="switchTab('method')">
-          Methodology
-        </button>
-      </nav>
-    </div>
+    <h1 class="header__title">Term Frequency in Academic Journals</h1>
+    <p class="header__subtitle">Track and visualize keyword occurrence across journals &amp; Google Scholar</p>
+    <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tabs__btn tabs__btn--active" role="tab" aria-selected="true"
+        aria-controls="tab-overview" id="btn-overview" onclick="switchTab('overview')">Overview &amp; Charts</button>
+      <button class="tabs__btn" role="tab" aria-selected="false"
+        aria-controls="tab-scholar" id="btn-scholar" onclick="switchTab('scholar')">Google Scholar Data</button>
+      <button class="tabs__btn" role="tab" aria-selected="false"
+        aria-controls="tab-journals" id="btn-journals" onclick="switchTab('journals')">Journal Data Entry</button>
+      <button class="tabs__btn" role="tab" aria-selected="false"
+        aria-controls="tab-settings" id="btn-settings" onclick="switchTab('settings')">Settings</button>
+      <button class="tabs__btn" role="tab" aria-selected="false"
+        aria-controls="tab-method" id="btn-method" onclick="switchTab('method')">Methodology</button>
+    </nav>
   </header>
 
-       CONTENT
   <main class="content" role="main">
-
-    <!-- Status bar -->
-    <div class="status-bar" id="status-bar">
+    <div class="status-bar">
       <span class="status-bar__dot"></span>
       <span id="status-text">Data auto-saved to browser storage</span>
     </div>
 
+    <!-- overview -->
     <section id="tab-overview" class="tab-panel tab-panel--active" role="tabpanel" aria-labelledby="btn-overview">
       <div class="info-box">
-        <strong>⚡ Getting Started:</strong> Go to <strong>Settings</strong> first to enter your
+        <strong>Getting Started:</strong> Go to <strong>Settings</strong> first to enter your
         search terms, target journals, and year range. Then use the <strong>Google Scholar Data</strong>
         and <strong>Journal Data Entry</strong> tabs to collect your counts — each cell has a pre-built
-        🔗 search link. Charts update automatically.
+        search link. Charts update automatically.
       </div>
       <div class="card">
         <h2 class="card__title">Google Scholar — All Terms Over Time</h2>
@@ -434,30 +225,33 @@
       <div class="card">
         <h2 class="card__title">Comparative Bar Chart — Per Year</h2>
         <p class="card__subtitle">Side-by-side comparison of all terms</p>
-        <div class="chart-wrap"><canvas id="barChart" aria-label="Bar chart comparing term frequency per year"></canvas></div>
+        <div class="chart-wrap"><canvas id="barChart" aria-label="Bar chart comparing term frequency"></canvas></div>
       </div>
       <div id="journal-charts-container"></div>
       <div class="card">
         <div class="btn-group">
-          <button class="btn btn--primary" onclick="exportCSV()">📥 Export Data as CSV</button>
-          <button class="btn btn--outline" onclick="exportJSON()">📋 Export as JSON</button>
-          <button class="btn btn--outline" onclick="window.print()">🖨️ Print Charts</button>
+          <button class="btn btn--primary" onclick="exportCSV()">Export Data as CSV</button>
+          <button class="btn btn--outline" onclick="exportJSON()">Export as JSON</button>
+          <button class="btn btn--outline" onclick="window.print()">Print Charts</button>
         </div>
       </div>
     </section>
 
+    <!-- scholar data entry -->
     <section id="tab-scholar" class="tab-panel" role="tabpanel" aria-labelledby="btn-scholar">
       <h2 class="card__title">Google Scholar Result Counts</h2>
-      <p class="card__subtitle">Click 🔗 to open the exact Google Scholar search. Enter the "About X results" number shown at the top.</p>
+      <p class="card__subtitle">Click the link to open the exact Google Scholar search. Enter the "About X results" number shown at the top.</p>
       <div id="scholar-tables"></div>
     </section>
 
+    <!-- journal data entry -->
     <section id="tab-journals" class="tab-panel" role="tabpanel" aria-labelledby="btn-journals">
       <h2 class="card__title">Journal-Specific Counts</h2>
-      <p class="card__subtitle">For each term × journal × year, click 🔗 to open Google Scholar filtered by source. Enter the result count.</p>
+      <p class="card__subtitle">For each term/journal/year combination, click the link to open Google Scholar filtered by source. Enter the result count.</p>
       <div id="journal-tables"></div>
     </section>
 
+    <!-- settings -->
     <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="btn-settings">
       <div class="card">
         <h2 class="card__title">Configuration</h2>
@@ -474,20 +268,18 @@
               style="width:100%;max-width:500px;margin-top:6px;padding:10px;border:1px solid var(--color-border-dark);border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:13px;resize:vertical;"></textarea>
           </label>
           <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
-            <label>
-              <strong>Start Year</strong><br>
+            <label><strong>Start Year</strong><br>
               <input id="cfg-year-start" type="number" min="1900" max="2030" value="2011"
                 style="margin-top:6px;padding:8px;border:1px solid var(--color-border-dark);border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:13px;width:100px;">
             </label>
-            <label>
-              <strong>End Year</strong><br>
+            <label><strong>End Year</strong><br>
               <input id="cfg-year-end" type="number" min="1900" max="2030" value="2026"
                 style="margin-top:6px;padding:8px;border:1px solid var(--color-border-dark);border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:13px;width:100px;">
             </label>
           </div>
           <div class="btn-group">
-            <button class="btn btn--primary" onclick="applySettings()">✅ Apply &amp; Rebuild</button>
-            <button class="btn btn--danger" onclick="resetAllData()">🗑️ Reset All Data</button>
+            <button class="btn btn--primary" onclick="applySettings()">Apply &amp; Rebuild</button>
+            <button class="btn btn--danger" onclick="resetAllData()">Reset All Data</button>
           </div>
         </div>
       </div>
@@ -495,10 +287,11 @@
         <h2 class="card__title">Import Data</h2>
         <p class="card__subtitle">Load a previously exported JSON file to restore your data.</p>
         <input type="file" id="import-file" accept=".json" style="font-family:var(--font-sans);font-size:13px;">
-        <button class="btn btn--outline" style="margin-top:8px;" onclick="importJSON()">📂 Import JSON</button>
+        <button class="btn btn--outline" style="margin-top:8px;" onclick="importJSON()">Import JSON</button>
       </div>
     </section>
 
+    <!-- methodology -->
     <section id="tab-method" class="tab-panel" role="tabpanel" aria-labelledby="btn-method">
       <div class="card">
         <h2 class="card__title">Research Methodology</h2>
@@ -513,30 +306,30 @@
           <p><strong>2. Journal-specific counts:</strong><br>
           Use the same approach but add <code>source:"Journal Name"</code> to your query.
           Example: <code>"your term" source:"Your Journal Name"</code>.
-          The 🔗 links in this dashboard are pre-built for you.</p>
+          The links in this dashboard are pre-built for you.</p>
 
           <p><strong>3. Alternative tools for more rigorous results:</strong><br>
           — <strong>Scopus</strong> or <strong>Web of Science</strong>: Allow precise filtering by
-          journal, year, and keyword in title/abstract/keywords. They also export as CSV.<br>
+          journal, year, and keyword. They also export as CSV.<br>
           — <strong>ERIC</strong> (<a href="https://eric.ed.gov" target="_blank" rel="noopener noreferrer">eric.ed.gov</a>):
-          Especially relevant for education journals.<br>
+          Good for education-related journals.<br>
           — <strong>Publish or Perish</strong> (free software by Harzing): Queries Google Scholar
-          programmatically and exports structured data with citation metrics.<br>
+          programmatically and exports structured data.<br>
           — <strong>Dimensions</strong> (<a href="https://app.dimensions.ai" target="_blank" rel="noopener noreferrer">dimensions.ai</a>):
-          Free tier available, good for trend analysis.</p>
+          Free tier available.</p>
 
           <p><strong>4. Important caveats:</strong><br>
-          — Google Scholar counts are approximate (rounded) and can fluctuate day to day.<br>
+          — Google Scholar counts are approximate and can fluctuate.<br>
           — The <code>source:</code> filter in Google Scholar is not perfectly reliable.<br>
-          — For publication-quality data, Scopus or Web of Science are strongly preferred.<br>
-          — Always record the date you collected data, as counts change over time.<br>
-          — Partial-year data (e.g., the current year) will appear lower and should be noted.</p>
+          — For publication-quality data, Scopus or Web of Science are preferred.<br>
+          — Record the date you collected data, as counts change over time.<br>
+          — Partial-year data will naturally show lower numbers.</p>
 
           <p><strong>5. Interpreting your charts:</strong><br>
-          — Line charts are best for spotting trends and turning points.<br>
-          — Bar charts make year-to-year comparison across terms easier.<br>
-          — Stacked area charts show how individual journals contribute to the total.<br>
-          — Use the CSV/JSON export for further statistical analysis in R, Python, or Excel.</p>
+          — Line charts show trends and turning points.<br>
+          — Bar charts make year-to-year comparison easier.<br>
+          — Stacked area charts show how journals contribute to the total.<br>
+          — Use the CSV/JSON export for further analysis in R, Python, or Excel.</p>
         </div>
       </div>
       <div class="card">
@@ -550,157 +343,137 @@
           <p>This is a free, open-source bibliometric research tool. It runs entirely in
           your browser — no data is sent to any server. Your data is saved in your browser's
           <code>localStorage</code> so it persists between sessions.</p>
-          <p>Source code and documentation:
+          <p>Source code:
           <a href="https://github.com/IA-Papastef/simpistic-bibliometric-dashboard" target="_blank"
           rel="noopener noreferrer">GitHub Repository</a></p>
-          <p>Licensed under the <strong>MIT License</strong>. Contributions welcome.</p>
+          <p>Licensed under the MIT License. Contributions welcome.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- TOAST -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-       JAVASCRIPT
   <script>
+  // storage key and color palette
+  var STORAGE_KEY = 'bibliometric_dashboard_v1';
+  var PALETTE = ['#c45d3e','#3e8a7e','#5b6abf','#d4a03c','#8b5e83','#e07b52','#5ea88e','#7b82cf','#b89030','#a07098'];
+  var PALETTE_ALPHA = PALETTE.map(function(c){ return c + '55'; });
 
-
-  
-     Config CONFIGURATION & STATE state
-     
-  const STORAGE_KEY = 'bibliometric_dashboard_v1';
-  const PALETTE = ['#c45d3e','#3e8a7e','#5b6abf','#d4a03c','#8b5e83','#e07b52','#5ea88e','#7b82cf','#b89030','#a07098'];
-  const PALETTE_ALPHA = PALETTE.map(c => c + '55');
-
-  let CONFIG = {
+  // default config
+  var CONFIG = {
     terms: ['term 1', 'term 2', 'term 3'],
-    journals: [
-      'Journal Name 1',
-      'Journal Name 2',
-      'Journal Name 3',
-    ],
+    journals: ['Journal Name 1', 'Journal Name 2', 'Journal Name 3'],
     yearStart: 2011,
     yearEnd: 2026,
   };
 
-  let scholarData = {};   // { term: { year: count|null } }
-  let journalData = {};   // { term: { journal: { year: count|null } } }
+  var scholarData = {};
+  var journalData = {};
+  var lineChart = null;
+  var barChart = null;
+  var journalCharts = [];
 
-  // Chart instances
-  let lineChart = null;
-  let barChart = null;
-  let journalCharts = [];
-
-  
-     Helpers
-     
   function getYears() {
-    const years = [];
-    for (let y = CONFIG.yearStart; y <= CONFIG.yearEnd; y++) years.push(y);
+    var years = [];
+    for (var y = CONFIG.yearStart; y <= CONFIG.yearEnd; y++) years.push(y);
     return years;
   }
 
   function scholarURL(term, year) {
-    return `https://scholar.google.com/scholar?q=%22${encodeURIComponent(term)}%22&as_ylo=${year}&as_yhi=${year}`;
+    return 'https://scholar.google.com/scholar?q=%22' + encodeURIComponent(term) + '%22&as_ylo=' + year + '&as_yhi=' + year;
   }
 
   function journalURL(term, year, journal) {
-    return `https://scholar.google.com/scholar?q=%22${encodeURIComponent(term)}%22+source:%22${encodeURIComponent(journal)}%22&as_ylo=${year}&as_yhi=${year}`;
+    return 'https://scholar.google.com/scholar?q=%22' + encodeURIComponent(term) + '%22+source:%22' + encodeURIComponent(journal) + '%22&as_ylo=' + year + '&as_yhi=' + year;
   }
 
-  function termColor(index) { return PALETTE[index % PALETTE.length]; }
-  function termColorAlpha(index) { return PALETTE_ALPHA[index % PALETTE_ALPHA.length]; }
+  function termColor(i) { return PALETTE[i % PALETTE.length]; }
+  function termColorAlpha(i) { return PALETTE_ALPHA[i % PALETTE_ALPHA.length]; }
 
-  
-     Save/load from localStorage
-     
+  // localStorage
   function saveState() {
     try {
-      const state = { config: CONFIG, scholarData, journalData, savedAt: new Date().toISOString() };
+      var state = { config: CONFIG, scholarData: scholarData, journalData: journalData, savedAt: new Date().toISOString() };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       updateStatus('Saved');
     } catch (e) {
-      console.warn('Could not save to localStorage:', e);
-      updateStatus('Save failed — storage may be full');
+      console.warn('Could not save:', e);
+      updateStatus('Save failed');
     }
   }
 
   function loadState() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
-      const state = JSON.parse(raw);
-      if (state.config) CONFIG = { ...CONFIG, ...state.config };
+      var state = JSON.parse(raw);
+      if (state.config) {
+        CONFIG.terms = state.config.terms || CONFIG.terms;
+        CONFIG.journals = state.config.journals || CONFIG.journals;
+        CONFIG.yearStart = state.config.yearStart || CONFIG.yearStart;
+        CONFIG.yearEnd = state.config.yearEnd || CONFIG.yearEnd;
+      }
       if (state.scholarData) scholarData = state.scholarData;
       if (state.journalData) journalData = state.journalData;
       return true;
     } catch (e) {
-      console.warn('Could not load from localStorage:', e);
+      console.warn('Could not load:', e);
       return false;
     }
   }
 
   function updateStatus(action) {
-    const el = document.getElementById('status-text');
-    const now = new Date().toLocaleTimeString();
-    el.textContent = `${action} at ${now}`;
+    var el = document.getElementById('status-text');
+    el.textContent = action + ' at ' + new Date().toLocaleTimeString();
   }
 
-  
-     ToastS
-     
-  let toastTimer = null;
-  function showToast(message, duration = 3000) {
-    const el = document.getElementById('toast');
-    el.textContent = message;
+  // toast
+  var toastTimer = null;
+  function showToast(msg, duration) {
+    duration = duration || 3000;
+    var el = document.getElementById('toast');
+    el.textContent = msg;
     el.classList.add('toast--visible');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('toast--visible'), duration);
+    toastTimer = setTimeout(function(){ el.classList.remove('toast--visible'); }, duration);
   }
 
-  
-     Data init
-     
+  // data init - make sure every term/journal/year slot exists
   function initializeData() {
-    const years = getYears();
-    CONFIG.terms.forEach(t => {
+    var years = getYears();
+    CONFIG.terms.forEach(function(t) {
       if (!scholarData[t]) scholarData[t] = {};
-      years.forEach(y => {
+      years.forEach(function(y) {
         if (scholarData[t][y] === undefined) scholarData[t][y] = null;
       });
     });
-    CONFIG.terms.forEach(t => {
+    CONFIG.terms.forEach(function(t) {
       if (!journalData[t]) journalData[t] = {};
-      CONFIG.journals.forEach(j => {
+      CONFIG.journals.forEach(function(j) {
         if (!journalData[t][j]) journalData[t][j] = {};
-        years.forEach(y => {
+        years.forEach(function(y) {
           if (journalData[t][j][y] === undefined) journalData[t][j][y] = null;
         });
       });
     });
   }
 
-  
-     Tab switching
-     
+  // tabs
   function switchTab(id) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-panel--active'));
-    document.querySelectorAll('.tabs__btn').forEach(b => {
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('tab-panel--active'); });
+    document.querySelectorAll('.tabs__btn').forEach(function(b) {
       b.classList.remove('tabs__btn--active');
       b.setAttribute('aria-selected', 'false');
     });
     document.getElementById('tab-' + id).classList.add('tab-panel--active');
     document.getElementById('btn-' + id).classList.add('tabs__btn--active');
     document.getElementById('btn-' + id).setAttribute('aria-selected', 'true');
-
     if (id === 'overview') refreshCharts();
     if (id === 'settings') populateSettings();
   }
 
-  
-     Data updates
-     
+  // data updates
   function updateScholar(term, year, value) {
     scholarData[term][year] = value === '' ? null : Number(value);
     saveState();
@@ -711,188 +484,100 @@
     saveState();
   }
 
-  
-     Table rendering
-     
+  // html escaping
+  function escHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  function escAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  // build the scholar data entry tables
   function buildScholarTables() {
-    const container = document.getElementById('scholar-tables');
-    const years = getYears();
-    let html = '';
-    CONFIG.terms.forEach((t, ti) => {
-      html += `<div class="card">
-        <div style="margin-bottom:16px">
-          <span class="chip" style="background:${termColor(ti)}18;color:${termColor(ti)}">"${escHtml(t)}"</span>
-        </div>
-        <div class="table-wrap"><table>
-          <thead><tr><th>Year</th><th>Count</th><th>Search</th></tr></thead>
-          <tbody>`;
-      years.forEach(y => {
-        const val = scholarData[t]?.[y] != null ? scholarData[t][y] : '';
-        html += `<tr>
-          <td style="font-weight:600">${y}</td>
-          <td><input class="data-input" type="number" min="0" value="${val}" placeholder="—"
-            aria-label="Count for ${escHtml(t)} in ${y}"
-            onchange="updateScholar('${escAttr(t)}',${y},this.value)"></td>
-          <td><a class="link-btn" href="${scholarURL(t,y)}" target="_blank" rel="noopener noreferrer"
-            aria-label="Search Google Scholar for ${escHtml(t)} in ${y}">🔗 Search</a></td>
-        </tr>`;
+    var container = document.getElementById('scholar-tables');
+    var years = getYears();
+    var html = '';
+    CONFIG.terms.forEach(function(t, ti) {
+      html += '<div class="card"><div style="margin-bottom:16px">' +
+        '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">"' + escHtml(t) + '"</span>' +
+        '</div><div class="table-wrap"><table><thead><tr><th>Year</th><th>Count</th><th>Search</th></tr></thead><tbody>';
+      years.forEach(function(y) {
+        var val = scholarData[t] && scholarData[t][y] != null ? scholarData[t][y] : '';
+        html += '<tr><td style="font-weight:600">' + y + '</td>' +
+          '<td><input class="data-input" type="number" min="0" value="' + val + '" placeholder="—" ' +
+          'aria-label="Count for ' + escHtml(t) + ' in ' + y + '" ' +
+          'onchange="updateScholar(\'' + escAttr(t) + '\',' + y + ',this.value)"></td>' +
+          '<td><a class="link-btn" href="' + scholarURL(t, y) + '" target="_blank" rel="noopener noreferrer">Search</a></td></tr>';
       });
-      html += `</tbody></table></div></div>`;
+      html += '</tbody></table></div></div>';
     });
     container.innerHTML = html;
   }
 
+  // build journal data entry tables
   function buildJournalTables() {
-    const container = document.getElementById('journal-tables');
-    const years = getYears();
-    let html = '';
-    CONFIG.terms.forEach((t, ti) => {
-      html += `<div class="card" style="margin-bottom:28px">
-        <div style="margin-bottom:16px">
-          <span class="chip" style="background:${termColor(ti)}18;color:${termColor(ti)}">"${escHtml(t)}"</span>
-        </div>
-        <div class="table-wrap"><table>
-          <thead><tr><th style="text-align:left;min-width:80px">Year</th>`;
-      CONFIG.journals.forEach(j => {
-        html += `<th style="min-width:130px;font-size:9px">${escHtml(j)}</th>`;
+    var container = document.getElementById('journal-tables');
+    var years = getYears();
+    var html = '';
+    CONFIG.terms.forEach(function(t, ti) {
+      html += '<div class="card" style="margin-bottom:28px"><div style="margin-bottom:16px">' +
+        '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">"' + escHtml(t) + '"</span>' +
+        '</div><div class="table-wrap"><table><thead><tr><th style="text-align:left;min-width:80px">Year</th>';
+      CONFIG.journals.forEach(function(j) {
+        html += '<th style="min-width:130px;font-size:9px">' + escHtml(j) + '</th>';
       });
-      html += `</tr></thead><tbody>`;
-      years.forEach(y => {
-        html += `<tr><td style="font-weight:600;text-align:left">${y}</td>`;
-        CONFIG.journals.forEach(j => {
-          const val = journalData[t]?.[j]?.[y] != null ? journalData[t][j][y] : '';
-          html += `<td><div class="journal-cell">
-            <input class="data-input data-input--sm" type="number" min="0" value="${val}" placeholder="—"
-              aria-label="Count for ${escHtml(t)} in ${escHtml(j)} ${y}"
-              onchange="updateJournal('${escAttr(t)}','${escAttr(j)}',${y},this.value)">
-            <a class="link-btn" href="${journalURL(t,y,j)}" target="_blank" rel="noopener noreferrer"
-              aria-label="Search ${escHtml(j)} for ${escHtml(t)} in ${y}" style="font-size:9px">🔗</a>
-          </div></td>`;
+      html += '</tr></thead><tbody>';
+      years.forEach(function(y) {
+        html += '<tr><td style="font-weight:600;text-align:left">' + y + '</td>';
+        CONFIG.journals.forEach(function(j) {
+          var val = journalData[t] && journalData[t][j] && journalData[t][j][y] != null ? journalData[t][j][y] : '';
+          html += '<td><div class="journal-cell">' +
+            '<input class="data-input data-input--sm" type="number" min="0" value="' + val + '" placeholder="—" ' +
+            'aria-label="Count for ' + escHtml(t) + ' in ' + escHtml(j) + ' ' + y + '" ' +
+            'onchange="updateJournal(\'' + escAttr(t) + '\',\'' + escAttr(j) + '\',' + y + ',this.value)">' +
+            '<a class="link-btn" href="' + journalURL(t, y, j) + '" target="_blank" rel="noopener noreferrer" style="font-size:9px">Search</a>' +
+            '</div></td>';
         });
-        html += `</tr>`;
+        html += '</tr>';
       });
-      html += `</tbody></table></div></div>`;
+      html += '</tbody></table></div></div>';
     });
     container.innerHTML = html;
   }
 
   function buildQuickLinks() {
-    const container = document.getElementById('quick-links');
-    const yStart = CONFIG.yearStart;
-    const yEnd = CONFIG.yearEnd;
-    let html = '';
-    CONFIG.terms.forEach(t => {
-      html += `<a class="link-btn link-btn--lg"
-        href="https://scholar.google.com/scholar?q=%22${encodeURIComponent(t)}%22&as_ylo=${yStart}&as_yhi=${yEnd}"
-        target="_blank" rel="noopener noreferrer">"${escHtml(t)}" — ${yStart}–${yEnd}</a>`;
+    var container = document.getElementById('quick-links');
+    var html = '';
+    CONFIG.terms.forEach(function(t) {
+      html += '<a class="link-btn link-btn--lg" href="https://scholar.google.com/scholar?q=%22' +
+        encodeURIComponent(t) + '%22&as_ylo=' + CONFIG.yearStart + '&as_yhi=' + CONFIG.yearEnd +
+        '" target="_blank" rel="noopener noreferrer">"' + escHtml(t) + '" — ' + CONFIG.yearStart + '–' + CONFIG.yearEnd + '</a>';
     });
     container.innerHTML = html;
   }
 
   function buildJournalChartContainers() {
-    const container = document.getElementById('journal-charts-container');
-    let html = '';
-    CONFIG.terms.forEach((t, ti) => {
-      html += `<div class="card">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-          <span class="chip" style="background:${termColor(ti)}18;color:${termColor(ti)}">${escHtml(t)}</span>
-          <h2 class="card__title" style="font-size:18px;margin-bottom:0">by Journal</h2>
-        </div>
-        <p class="card__subtitle">Breakdown across the target journals</p>
-        <div class="chart-wrap"><canvas id="journalChart${ti}"
-          aria-label="Stacked area chart for ${escHtml(t)} by journal"></canvas></div>
-      </div>`;
+    var container = document.getElementById('journal-charts-container');
+    var html = '';
+    CONFIG.terms.forEach(function(t, ti) {
+      html += '<div class="card">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
+        '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">' + escHtml(t) + '</span>' +
+        '<h2 class="card__title" style="font-size:18px;margin-bottom:0">by Journal</h2></div>' +
+        '<p class="card__subtitle">Breakdown across the target journals</p>' +
+        '<div class="chart-wrap"><canvas id="journalChart' + ti + '" aria-label="Journal breakdown for ' + escHtml(t) + '"></canvas></div></div>';
     });
     container.innerHTML = html;
   }
 
-  
-     Charts
-     
-  function initCharts() {
-    const years = getYears();
-
-    // Destroy existing charts
-    if (lineChart) lineChart.destroy();
-    if (barChart) barChart.destroy();
-    journalCharts.forEach(c => { if (c) c.destroy(); });
-    journalCharts = [];
-
-    // Line Chart
-    const ctx1 = document.getElementById('lineChart').getContext('2d');
-    lineChart = new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: years,
-        datasets: CONFIG.terms.map((t, i) => ({
-          label: t,
-          data: years.map(y => scholarData[t]?.[y] || null),
-          borderColor: termColor(i),
-          backgroundColor: termColorAlpha(i),
-          tension: 0.3,
-          pointRadius: 3,
-          borderWidth: 2.5,
-          spanGaps: true,
-        })),
-      },
-      options: chartOptions(),
-    });
-
-    // Bar Chart
-    const ctx2 = document.getElementById('barChart').getContext('2d');
-    barChart = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: years,
-        datasets: CONFIG.terms.map((t, i) => ({
-          label: t,
-          data: years.map(y => scholarData[t]?.[y] || null),
-          backgroundColor: termColor(i) + 'cc',
-          borderColor: termColor(i),
-          borderWidth: 1,
-          borderRadius: 3,
-        })),
-      },
-      options: chartOptions(),
-    });
-
-    // Journal Charts (stacked area per term)
-    CONFIG.terms.forEach((t, ti) => {
-      const ctx = document.getElementById('journalChart' + ti).getContext('2d');
-      journalCharts[ti] = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: years,
-          datasets: CONFIG.journals.map((j, ji) => ({
-            label: j,
-            data: years.map(y => journalData[t]?.[j]?.[y] || null),
-            borderColor: PALETTE[ji % PALETTE.length],
-            backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-            borderWidth: 2,
-            spanGaps: true,
-          })),
-        },
-        options: {
-          ...chartOptions(),
-          scales: {
-            ...chartOptions().scales,
-            y: { ...chartOptions().scales.y, stacked: true },
-          },
-        },
-      });
-    });
-  }
-
+  // charts
   function chartOptions() {
     return {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
-      },
+      plugins: { legend: { labels: { font: { family: "'DM Sans'", size: 11 } } } },
       scales: {
         x: { ticks: { font: { family: "'DM Sans'", size: 11 } } },
         y: { ticks: { font: { family: "'DM Sans'", size: 11 } }, beginAtZero: true },
@@ -900,30 +585,87 @@
     };
   }
 
+  function initCharts() {
+    var years = getYears();
+    if (lineChart) lineChart.destroy();
+    if (barChart) barChart.destroy();
+    journalCharts.forEach(function(c) { if (c) c.destroy(); });
+    journalCharts = [];
+
+    lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: CONFIG.terms.map(function(t, i) {
+          return {
+            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+            borderColor: termColor(i), backgroundColor: termColorAlpha(i),
+            tension: 0.3, pointRadius: 3, borderWidth: 2.5, spanGaps: true,
+          };
+        }),
+      },
+      options: chartOptions(),
+    });
+
+    barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: years,
+        datasets: CONFIG.terms.map(function(t, i) {
+          return {
+            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+            backgroundColor: termColor(i) + 'cc', borderColor: termColor(i), borderWidth: 1, borderRadius: 3,
+          };
+        }),
+      },
+      options: chartOptions(),
+    });
+
+    CONFIG.terms.forEach(function(t, ti) {
+      var opts = chartOptions();
+      opts.scales.y.stacked = true;
+      journalCharts[ti] = new Chart(document.getElementById('journalChart' + ti).getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: CONFIG.journals.map(function(j, ji) {
+            return {
+              label: j,
+              data: years.map(function(y) { return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null; }),
+              borderColor: PALETTE[ji % PALETTE.length], backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
+              fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2, spanGaps: true,
+            };
+          }),
+        },
+        options: opts,
+      });
+    });
+  }
+
   function refreshCharts() {
-    const years = getYears();
-    CONFIG.terms.forEach((t, ti) => {
-      const sData = years.map(y => scholarData[t]?.[y] || null);
-      if (lineChart?.data?.datasets?.[ti]) lineChart.data.datasets[ti].data = sData;
-      if (barChart?.data?.datasets?.[ti]) barChart.data.datasets[ti].data = sData;
+    var years = getYears();
+    CONFIG.terms.forEach(function(t, ti) {
+      var sData = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
+      if (lineChart && lineChart.data.datasets[ti]) lineChart.data.datasets[ti].data = sData;
+      if (barChart && barChart.data.datasets[ti]) barChart.data.datasets[ti].data = sData;
     });
     if (lineChart) lineChart.update();
     if (barChart) barChart.update();
 
-    CONFIG.terms.forEach((t, ti) => {
+    CONFIG.terms.forEach(function(t, ti) {
       if (!journalCharts[ti]) return;
-      CONFIG.journals.forEach((j, ji) => {
-        if (journalCharts[ti]?.data?.datasets?.[ji]) {
-          journalCharts[ti].data.datasets[ji].data = years.map(y => journalData[t]?.[j]?.[y] || null);
+      CONFIG.journals.forEach(function(j, ji) {
+        if (journalCharts[ti].data.datasets[ji]) {
+          journalCharts[ti].data.datasets[ji].data = years.map(function(y) {
+            return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null;
+          });
         }
       });
       journalCharts[ti].update();
     });
   }
 
-  
-     Settings
-     
+  // settings
   function populateSettings() {
     document.getElementById('cfg-terms').value = CONFIG.terms.join('\n');
     document.getElementById('cfg-journals').value = CONFIG.journals.join('\n');
@@ -932,14 +674,14 @@
   }
 
   function applySettings() {
-    const terms = document.getElementById('cfg-terms').value.split('\n').map(s => s.trim()).filter(Boolean);
-    const journals = document.getElementById('cfg-journals').value.split('\n').map(s => s.trim()).filter(Boolean);
-    const yearStart = parseInt(document.getElementById('cfg-year-start').value, 10);
-    const yearEnd = parseInt(document.getElementById('cfg-year-end').value, 10);
+    var terms = document.getElementById('cfg-terms').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+    var journals = document.getElementById('cfg-journals').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+    var yearStart = parseInt(document.getElementById('cfg-year-start').value, 10);
+    var yearEnd = parseInt(document.getElementById('cfg-year-end').value, 10);
 
-    if (terms.length === 0) { showToast('⚠️ Add at least one search term'); return; }
-    if (journals.length === 0) { showToast('⚠️ Add at least one journal'); return; }
-    if (yearStart >= yearEnd) { showToast('⚠️ Start year must be before end year'); return; }
+    if (terms.length === 0) { showToast('Add at least one search term'); return; }
+    if (journals.length === 0) { showToast('Add at least one journal'); return; }
+    if (yearStart >= yearEnd) { showToast('Start year must be before end year'); return; }
 
     CONFIG.terms = terms;
     CONFIG.journals = journals;
@@ -949,7 +691,7 @@
     initializeData();
     rebuildAll();
     saveState();
-    showToast('✅ Settings applied & dashboard rebuilt');
+    showToast('Settings applied — dashboard rebuilt');
   }
 
   function resetAllData() {
@@ -957,61 +699,64 @@
     localStorage.removeItem(STORAGE_KEY);
     scholarData = {};
     journalData = {};
+    CONFIG.terms = ['term 1', 'term 2', 'term 3'];
+    CONFIG.journals = ['Journal Name 1', 'Journal Name 2', 'Journal Name 3'];
+    CONFIG.yearStart = 2011;
+    CONFIG.yearEnd = 2026;
     initializeData();
     rebuildAll();
-    showToast('🗑️ All data has been reset');
+    showToast('All data has been reset');
   }
 
-  
-     Export & import
-     
+  // export / import
   function exportCSV() {
-    const years = getYears();
-    let csv = 'Source,Term,Year,Count\n';
-    CONFIG.terms.forEach(t => {
-      years.forEach(y => {
-        csv += `Google Scholar,"${t}",${y},${scholarData[t]?.[y] ?? ''}\n`;
+    var years = getYears();
+    var csv = 'Source,Term,Year,Count\n';
+    CONFIG.terms.forEach(function(t) {
+      years.forEach(function(y) {
+        var v = scholarData[t] && scholarData[t][y] != null ? scholarData[t][y] : '';
+        csv += 'Google Scholar,"' + t + '",' + y + ',' + v + '\n';
       });
     });
-    CONFIG.terms.forEach(t => {
-      CONFIG.journals.forEach(j => {
-        years.forEach(y => {
-          csv += `"${j}","${t}",${y},${journalData[t]?.[j]?.[y] ?? ''}\n`;
+    CONFIG.terms.forEach(function(t) {
+      CONFIG.journals.forEach(function(j) {
+        years.forEach(function(y) {
+          var v = journalData[t] && journalData[t][j] && journalData[t][j][y] != null ? journalData[t][j][y] : '';
+          csv += '"' + j + '","' + t + '",' + y + ',' + v + '\n';
         });
       });
     });
     downloadFile(csv, 'bibliometric_data.csv', 'text/csv');
-    showToast('📥 CSV exported');
+    showToast('CSV exported');
   }
 
   function exportJSON() {
-    const data = {
-      config: CONFIG,
-      scholarData,
-      journalData,
-      exportedAt: new Date().toISOString(),
-      version: '1.0.0',
-    };
+    var data = { config: CONFIG, scholarData: scholarData, journalData: journalData, exportedAt: new Date().toISOString(), version: '1.0.0' };
     downloadFile(JSON.stringify(data, null, 2), 'bibliometric_data.json', 'application/json');
-    showToast('📋 JSON exported');
+    showToast('JSON exported');
   }
 
   function importJSON() {
-    const fileInput = document.getElementById('import-file');
-    if (!fileInput.files.length) { showToast('⚠️ Select a JSON file first'); return; }
-    const reader = new FileReader();
+    var fileInput = document.getElementById('import-file');
+    if (!fileInput.files.length) { showToast('Select a JSON file first'); return; }
+    var reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const data = JSON.parse(e.target.result);
-        if (data.config) CONFIG = { ...CONFIG, ...data.config };
+        var data = JSON.parse(e.target.result);
+        if (data.config) {
+          CONFIG.terms = data.config.terms || CONFIG.terms;
+          CONFIG.journals = data.config.journals || CONFIG.journals;
+          CONFIG.yearStart = data.config.yearStart || CONFIG.yearStart;
+          CONFIG.yearEnd = data.config.yearEnd || CONFIG.yearEnd;
+        }
         if (data.scholarData) scholarData = data.scholarData;
         if (data.journalData) journalData = data.journalData;
         initializeData();
         rebuildAll();
         saveState();
-        showToast('✅ Data imported successfully');
+        showToast('Data imported successfully');
       } catch (err) {
-        showToast('❌ Invalid JSON file');
+        showToast('Invalid JSON file');
         console.error('Import error:', err);
       }
     };
@@ -1019,8 +764,8 @@
   }
 
   function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const a = document.createElement('a');
+    var blob = new Blob([content], { type: mimeType });
+    var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = filename;
     document.body.appendChild(a);
@@ -1029,21 +774,7 @@
     URL.revokeObjectURL(a.href);
   }
 
-  
-     Escaping
-     
-  function escHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-  function escAttr(str) {
-    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  }
-
-  
-     Rebuild
-     
+  // full rebuild
   function rebuildAll() {
     buildScholarTables();
     buildJournalTables();
@@ -1053,18 +784,11 @@
     populateSettings();
   }
 
-  
-     Init
-     
+  // kick it off
   (function init() {
-    const loaded = loadState();
+    var loaded = loadState();
     initializeData();
-
-    // No sample data — start clean for first-time users
-    if (!loaded) {
-      saveState();
-    }
-
+    if (!loaded) saveState();
     rebuildAll();
     updateStatus('Loaded');
   })();
