@@ -4,9 +4,13 @@ A free, open-source, browser-based tool for tracking and visualizing the frequen
 
 **No installation. No server. No dependencies.** Just open `index.html` in your browser.
 
+[![🚀 Open Live Demo](https://img.shields.io/badge/🚀_Open_Live_Demo-Click_Here-c45d3e?style=for-the-badge&logoColor=white)](https://ia-papastef.github.io/simpistic-bibliometric-dashboard/)
+
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![No Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![Status: Stable](https://img.shields.io/badge/status-stable-green)
+
+> **👉 [Try it now in your browser](https://ia-papastef.github.io/simpistic-bibliometric-dashboard/)** — no download needed!
 
 ---
 
