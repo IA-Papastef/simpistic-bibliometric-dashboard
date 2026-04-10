@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Bibliometric research dashboard for tracking term frequency in academic journals and Google Scholar. Free, open-source, runs entirely in the browser.">
-  <meta name="keywords" content="bibliometrics, Google Scholar, term frequency, academic research, cosmopolitanism, global justice, philosophy of education">
+  <meta name="keywords" content="bibliometrics, Google Scholar, term frequency, academic research, journal analysis, literature review">
   <meta name="author" content="Bibliometric Dashboard Contributors">
   <meta property="og:title" content="Bibliometric Research Dashboard">
   <meta property="og:description" content="Track and visualize term frequency across academic journals and Google Scholar. No server required.">
@@ -22,9 +22,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ============================================================
-       CSS CUSTOM PROPERTIES
-       ============================================================ */
+    
+       Variables
+       
     :root {
       --color-bg: #f5f0e8;
       --color-bg-dark: #2a2520;
@@ -62,9 +62,9 @@
       --transition-fast: 0.2s ease;
     }
 
-    /* ============================================================
-       RESET & BASE
-       ============================================================ */
+    
+       Reset
+       
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -75,17 +75,17 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ============================================================
-       FOCUS STYLES (Accessibility)
-       ============================================================ */
+    
+       Focus styles
+       
     :focus-visible {
       outline: 2px solid var(--color-accent);
       outline-offset: 2px;
     }
 
-    /* ============================================================
-       HEADER
-       ============================================================ */
+    
+       Header
+       
     .header {
       background: var(--color-bg-dark);
       padding: 32px 36px 0;
@@ -120,9 +120,9 @@
       gap: 10px;
     }
 
-    /* ============================================================
-       TABS
-       ============================================================ */
+    
+       Tabs
+       
     .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-bg-dark-alt); flex-wrap: wrap; }
     .tabs__btn {
       padding: 10px 20px;
@@ -141,9 +141,9 @@
     .tabs__btn--active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
     .tabs__btn:hover { color: var(--color-text-inverse); }
 
-    /* ============================================================
-       LAYOUT
-       ============================================================ */
+    
+       Layout
+       
     .content { padding: 28px 36px; max-width: 1140px; margin: 0 auto; }
     @media (max-width: 640px) {
       .header { padding: 20px 16px 0; }
@@ -151,9 +151,9 @@
       .tabs__btn { padding: 8px 12px; font-size: 11px; }
     }
 
-    /* ============================================================
-       CARDS
-       ============================================================ */
+    
+       Cards
+       
     .card {
       background: var(--color-surface);
       border-radius: var(--radius-lg);
@@ -175,9 +175,9 @@
       line-height: 1.5;
     }
 
-    /* ============================================================
-       INFO BOX
-       ============================================================ */
+    
+       Info box
+       
     .info-box {
       background: var(--color-info-bg);
       border: 1px solid var(--color-info-border);
@@ -190,9 +190,9 @@
     }
     .info-box strong { color: var(--color-accent); }
 
-    /* ============================================================
-       STATUS BAR
-       ============================================================ */
+    
+       Status bar
+       
     .status-bar {
       display: flex;
       align-items: center;
@@ -209,9 +209,9 @@
       display: inline-block;
     }
 
-    /* ============================================================
-       CHIPS
-       ============================================================ */
+    
+       Chips
+       
     .chip {
       display: inline-block;
       padding: 3px 10px;
@@ -222,9 +222,9 @@
       margin-right: 6px;
     }
 
-    /* ============================================================
-       TABLES
-       ============================================================ */
+    
+       Tables
+       
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { border-collapse: collapse; width: 100%; }
     th, td {
@@ -247,9 +247,9 @@
     td { border-bottom: 1px solid var(--color-border); }
     tr:hover td { background: rgba(196, 93, 62, 0.04); }
 
-    /* ============================================================
-       INPUTS
-       ============================================================ */
+    
+       Inputs
+       
     .data-input {
       width: 64px;
       padding: 4px 6px;
@@ -268,9 +268,9 @@
     }
     .data-input--sm { width: 52px; }
 
-    /* ============================================================
-       BUTTONS & LINKS
-       ============================================================ */
+    
+       Buttons
+       
     .link-btn {
       display: inline-block;
       padding: 2px 8px;
@@ -306,15 +306,15 @@
 
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
-    /* ============================================================
-       CHART CONTAINERS
-       ============================================================ */
+    
+       Charts
+       
     .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
-    /* ============================================================
-       JOURNAL INPUT CELLS
-       ============================================================ */
+    
+       Journal cells
+       
     .journal-cell {
       display: flex;
       flex-direction: column;
@@ -322,9 +322,9 @@
       gap: 3px;
     }
 
-    /* ============================================================
-       METHODOLOGY TEXT
-       ============================================================ */
+    
+       Prose
+       
     .prose { font-family: var(--font-sans); font-size: 14px; line-height: 1.8; color: #3a3530; }
     .prose p { margin-bottom: 16px; }
     .prose ul { padding-left: 20px; margin-top: 8px; }
@@ -337,15 +337,15 @@
       font-size: 12px;
     }
 
-    /* ============================================================
-       TAB PANELS
-       ============================================================ */
+    
+       Tab panels
+       
     .tab-panel { display: none; }
     .tab-panel--active { display: block; }
 
-    /* ============================================================
-       TOAST NOTIFICATION
-       ============================================================ */
+    
+       Toast
+       
     .toast {
       position: fixed;
       bottom: 24px;
@@ -364,9 +364,9 @@
     }
     .toast--visible { transform: translateY(0); opacity: 1; }
 
-    /* ============================================================
-       PRINT STYLES
-       ============================================================ */
+    
+       Print
+       
     @media print {
       .header, .tabs, .info-box, .link-btn, .btn, .data-input, .status-bar { display: none !important; }
       .tab-panel { display: block !important; }
@@ -377,9 +377,7 @@
 </head>
 <body>
 
-  <!-- ============================================================
-       HEADER
-       ============================================================ -->
+       Header
   <header class="header" role="banner">
     <div class="header__label">Bibliometric Research Dashboard</div>
     <h1 class="header__title" id="app-title">Term Frequency in Academic Journals</h1>
@@ -412,24 +410,21 @@
     </div>
   </header>
 
-  <!-- ============================================================
        CONTENT
-       ============================================================ -->
   <main class="content" role="main">
 
-    <!-- STATUS BAR -->
+    <!-- Status bar -->
     <div class="status-bar" id="status-bar">
       <span class="status-bar__dot"></span>
       <span id="status-text">Data auto-saved to browser storage</span>
     </div>
 
-    <!-- ==================== OVERVIEW TAB ==================== -->
     <section id="tab-overview" class="tab-panel tab-panel--active" role="tabpanel" aria-labelledby="btn-overview">
       <div class="info-box">
-        <strong>⚡ Getting Started:</strong> This dashboard ships with <em>sample data</em> to illustrate the charts.
-        Go to <strong>Settings</strong> to customize your search terms, journals, and year range.
-        Then use the <strong>Google Scholar Data</strong> and <strong>Journal Data Entry</strong> tabs to replace
-        sample values with your real counts. Each cell has a 🔗 link to the pre-built search query.
+        <strong>⚡ Getting Started:</strong> Go to <strong>Settings</strong> first to enter your
+        search terms, target journals, and year range. Then use the <strong>Google Scholar Data</strong>
+        and <strong>Journal Data Entry</strong> tabs to collect your counts — each cell has a pre-built
+        🔗 search link. Charts update automatically.
       </div>
       <div class="card">
         <h2 class="card__title">Google Scholar — All Terms Over Time</h2>
@@ -451,21 +446,18 @@
       </div>
     </section>
 
-    <!-- ==================== SCHOLAR TAB ==================== -->
     <section id="tab-scholar" class="tab-panel" role="tabpanel" aria-labelledby="btn-scholar">
       <h2 class="card__title">Google Scholar Result Counts</h2>
       <p class="card__subtitle">Click 🔗 to open the exact Google Scholar search. Enter the "About X results" number shown at the top.</p>
       <div id="scholar-tables"></div>
     </section>
 
-    <!-- ==================== JOURNALS TAB ==================== -->
     <section id="tab-journals" class="tab-panel" role="tabpanel" aria-labelledby="btn-journals">
       <h2 class="card__title">Journal-Specific Counts</h2>
       <p class="card__subtitle">For each term × journal × year, click 🔗 to open Google Scholar filtered by source. Enter the result count.</p>
       <div id="journal-tables"></div>
     </section>
 
-    <!-- ==================== SETTINGS TAB ==================== -->
     <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="btn-settings">
       <div class="card">
         <h2 class="card__title">Configuration</h2>
@@ -507,7 +499,6 @@
       </div>
     </section>
 
-    <!-- ==================== METHODOLOGY TAB ==================== -->
     <section id="tab-method" class="tab-panel" role="tabpanel" aria-labelledby="btn-method">
       <div class="card">
         <h2 class="card__title">Research Methodology</h2>
@@ -521,7 +512,7 @@
 
           <p><strong>2. Journal-specific counts:</strong><br>
           Use the same approach but add <code>source:"Journal Name"</code> to your query.
-          Example: <code>"cosmopolitanism" source:"Educational Philosophy and Theory"</code>.
+          Example: <code>"your term" source:"Your Journal Name"</code>.
           The 🔗 links in this dashboard are pre-built for you.</p>
 
           <p><strong>3. Alternative tools for more rigorous results:</strong><br>
@@ -571,34 +562,23 @@
   <!-- TOAST -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <!-- ============================================================
        JAVASCRIPT
-       ============================================================ -->
   <script>
-  /**
-   * Bibliometric Research Dashboard
-   * ================================
-   * A client-side tool for tracking term frequency in academic journals.
-   * All data stored in localStorage. No server required.
-   *
-   * License: MIT
-   */
 
-  /* ============================================================
-     CONFIGURATION & STATE
-     ============================================================ */
+
+  
+     Config CONFIGURATION & STATE state
+     
   const STORAGE_KEY = 'bibliometric_dashboard_v1';
   const PALETTE = ['#c45d3e','#3e8a7e','#5b6abf','#d4a03c','#8b5e83','#e07b52','#5ea88e','#7b82cf','#b89030','#a07098'];
   const PALETTE_ALPHA = PALETTE.map(c => c + '55');
 
   let CONFIG = {
-    terms: ['cosmopolitanism', 'cosmopolitan justice', 'global justice'],
+    terms: ['term 1', 'term 2', 'term 3'],
     journals: [
-      'Ethics and Education',
-      'Educational Philosophy and Theory',
-      'Journal of Philosophy of Education',
-      'Educational Theory',
-      'Studies in Philosophy and Education',
+      'Journal Name 1',
+      'Journal Name 2',
+      'Journal Name 3',
     ],
     yearStart: 2011,
     yearEnd: 2026,
@@ -612,9 +592,9 @@
   let barChart = null;
   let journalCharts = [];
 
-  /* ============================================================
-     HELPERS
-     ============================================================ */
+  
+     Helpers
+     
   function getYears() {
     const years = [];
     for (let y = CONFIG.yearStart; y <= CONFIG.yearEnd; y++) years.push(y);
@@ -632,9 +612,9 @@
   function termColor(index) { return PALETTE[index % PALETTE.length]; }
   function termColorAlpha(index) { return PALETTE_ALPHA[index % PALETTE_ALPHA.length]; }
 
-  /* ============================================================
-     PERSISTENCE (localStorage)
-     ============================================================ */
+  
+     Save/load from localStorage
+     
   function saveState() {
     try {
       const state = { config: CONFIG, scholarData, journalData, savedAt: new Date().toISOString() };
@@ -667,9 +647,9 @@
     el.textContent = `${action} at ${now}`;
   }
 
-  /* ============================================================
-     TOAST NOTIFICATIONS
-     ============================================================ */
+  
+     ToastS
+     
   let toastTimer = null;
   function showToast(message, duration = 3000) {
     const el = document.getElementById('toast');
@@ -679,9 +659,9 @@
     toastTimer = setTimeout(() => el.classList.remove('toast--visible'), duration);
   }
 
-  /* ============================================================
-     DATA INITIALIZATION
-     ============================================================ */
+  
+     Data init
+     
   function initializeData() {
     const years = getYears();
     CONFIG.terms.forEach(t => {
@@ -701,9 +681,9 @@
     });
   }
 
-  /* ============================================================
-     TAB SWITCHING
-     ============================================================ */
+  
+     Tab switching
+     
   function switchTab(id) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-panel--active'));
     document.querySelectorAll('.tabs__btn').forEach(b => {
@@ -718,9 +698,9 @@
     if (id === 'settings') populateSettings();
   }
 
-  /* ============================================================
-     DATA UPDATE HANDLERS
-     ============================================================ */
+  
+     Data updates
+     
   function updateScholar(term, year, value) {
     scholarData[term][year] = value === '' ? null : Number(value);
     saveState();
@@ -731,9 +711,9 @@
     saveState();
   }
 
-  /* ============================================================
-     BUILD TABLES
-     ============================================================ */
+  
+     Table rendering
+     
   function buildScholarTables() {
     const container = document.getElementById('scholar-tables');
     const years = getYears();
@@ -826,9 +806,9 @@
     container.innerHTML = html;
   }
 
-  /* ============================================================
-     CHARTS
-     ============================================================ */
+  
+     Charts
+     
   function initCharts() {
     const years = getYears();
 
@@ -941,9 +921,9 @@
     });
   }
 
-  /* ============================================================
-     SETTINGS
-     ============================================================ */
+  
+     Settings
+     
   function populateSettings() {
     document.getElementById('cfg-terms').value = CONFIG.terms.join('\n');
     document.getElementById('cfg-journals').value = CONFIG.journals.join('\n');
@@ -982,9 +962,9 @@
     showToast('🗑️ All data has been reset');
   }
 
-  /* ============================================================
-     EXPORT & IMPORT
-     ============================================================ */
+  
+     Export & import
+     
   function exportCSV() {
     const years = getYears();
     let csv = 'Source,Term,Year,Count\n';
@@ -1049,9 +1029,9 @@
     URL.revokeObjectURL(a.href);
   }
 
-  /* ============================================================
-     HTML ESCAPING
-     ============================================================ */
+  
+     Escaping
+     
   function escHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -1061,9 +1041,9 @@
     return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
   }
 
-  /* ============================================================
-     FULL REBUILD
-     ============================================================ */
+  
+     Rebuild
+     
   function rebuildAll() {
     buildScholarTables();
     buildJournalTables();
@@ -1073,18 +1053,15 @@
     populateSettings();
   }
 
-  /* ============================================================
-     INITIALIZATION
-     ============================================================ */
+  
+     Init
+     
   (function init() {
     const loaded = loadState();
     initializeData();
 
-    // Load sample data if no saved data exists
+    // No sample data — start clean for first-time users
     if (!loaded) {
-      scholarData['cosmopolitanism'] = {2011:3200,2012:3400,2013:3500,2014:3700,2015:3900,2016:4100,2017:4200,2018:4400,2019:4600,2020:4300,2021:4500,2022:4700,2023:4900,2024:5000,2025:4200,2026:1800};
-      scholarData['cosmopolitan justice'] = {2011:89,2012:95,2013:102,2014:110,2015:98,2016:105,2017:112,2018:120,2019:115,2020:108,2021:125,2022:130,2023:128,2024:135,2025:110,2026:45};
-      scholarData['global justice'] = {2011:2800,2012:3000,2013:3100,2014:3200,2015:3400,2016:3500,2017:3600,2018:3800,2019:3900,2020:3700,2021:3800,2022:4000,2023:4100,2024:4200,2025:3500,2026:1500};
       saveState();
     }
 
