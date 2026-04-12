@@ -11,9 +11,7 @@
   <meta property="og:type" content="website">
   <title>Bibliometric Research Dashboard</title>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
-    integrity="sha512-CQBSSt0Bm2MlDJMYbBFNUEoMBCpgYJ6Clz0HIEP4VIBfPz5WFMiyYAMBMZB3JMFhjGTaIcSQrYbUvYJo5SDNQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -572,6 +570,11 @@
     container.innerHTML = html;
   }
 
+  // safe data access — || null treats 0 as null, so we use explicit null check
+  function getVal(obj, key) { return obj && obj[key] != null ? obj[key] : null; }
+  function getScholar(t, y) { return scholarData[t] ? getVal(scholarData[t], y) : null; }
+  function getJournal(t, j, y) { return journalData[t] && journalData[t][j] ? getVal(journalData[t][j], y) : null; }
+
   // charts
   function chartOptions() {
     return {
@@ -586,6 +589,17 @@
   }
 
   function initCharts() {
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js library not loaded');
+      var containers = [document.getElementById('lineChart'), document.getElementById('barChart')];
+      containers.forEach(function(c) {
+        if (c && c.parentNode) {
+          c.parentNode.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-sans);color:var(--color-accent);font-size:14px;text-align:center;padding:20px;">' +
+            '⚠ Chart.js failed to load. Please check your internet connection and reload the page.</div>';
+        }
+      });
+      return;
+    }
     var years = getYears();
     if (lineChart) lineChart.destroy();
     if (barChart) barChart.destroy();
@@ -598,7 +612,7 @@
         labels: years,
         datasets: CONFIG.terms.map(function(t, i) {
           return {
-            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+            label: t, data: years.map(function(y) { return getScholar(t, y); }),
             borderColor: termColor(i), backgroundColor: termColorAlpha(i),
             tension: 0.3, pointRadius: 3, borderWidth: 2.5, spanGaps: true,
           };
@@ -613,7 +627,7 @@
         labels: years,
         datasets: CONFIG.terms.map(function(t, i) {
           return {
-            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+            label: t, data: years.map(function(y) { return getScholar(t, y); }),
             backgroundColor: termColor(i) + 'cc', borderColor: termColor(i), borderWidth: 1, borderRadius: 3,
           };
         }),
@@ -631,7 +645,7 @@
           datasets: CONFIG.journals.map(function(j, ji) {
             return {
               label: j,
-              data: years.map(function(y) { return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null; }),
+              data: years.map(function(y) { return getJournal(t, j, y); }),
               borderColor: PALETTE[ji % PALETTE.length], backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
               fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2, spanGaps: true,
             };
@@ -645,7 +659,7 @@
   function refreshCharts() {
     var years = getYears();
     CONFIG.terms.forEach(function(t, ti) {
-      var sData = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
+      var sData = years.map(function(y) { return getScholar(t, y); });
       if (lineChart && lineChart.data.datasets[ti]) lineChart.data.datasets[ti].data = sData;
       if (barChart && barChart.data.datasets[ti]) barChart.data.datasets[ti].data = sData;
     });
@@ -657,7 +671,7 @@
       CONFIG.journals.forEach(function(j, ji) {
         if (journalCharts[ti].data.datasets[ji]) {
           journalCharts[ti].data.datasets[ji].data = years.map(function(y) {
-            return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null;
+            return getJournal(t, j, y);
           });
         }
       });
