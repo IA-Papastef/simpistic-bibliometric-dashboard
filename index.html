@@ -491,7 +491,11 @@
     document.getElementById('tab-' + id).classList.add('tab-panel--active');
     document.getElementById('btn-' + id).classList.add('tabs__btn--active');
     document.getElementById('btn-' + id).setAttribute('aria-selected', 'true');
-    if (id === 'overview') refreshCharts();
+    if (id === 'overview') {
+      buildIndividualChartContainers();
+      buildJournalChartContainers();
+      initCharts();
+    }
     if (id === 'settings') populateSettings();
   }
 
