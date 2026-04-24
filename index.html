@@ -11,7 +11,9 @@
   <meta property="og:type" content="website">
   <title>Bibliometric Research Dashboard</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+    integrity="sha512-CQBSSt0Bm2MlDJMYbBFNUEoMBCpgYJ6Clz0HIEP4VIBfPz5WFMiyYAMBMZB3JMFhjGTaIcSQrYbUvYJo5SDNQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,6 +155,19 @@
     .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-bottom: 8px;
+    }
+    .stat-card {
+      background: var(--color-bg); border-radius: var(--radius-md); padding: 16px;
+      font-family: var(--font-sans);
+    }
+    .stat-card__label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .stat-card__value { font-size: 24px; font-weight: 700; }
+    .stat-card__detail { font-size: 11px; color: var(--color-text-muted); margin-top: 4px; }
+    .chart-wrap--sm { height: 300px; }
+
     .journal-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 
     .prose { font-family: var(--font-sans); font-size: 14px; line-height: 1.8; color: #3a3530; }
@@ -225,6 +240,13 @@
         <p class="card__subtitle">Side-by-side comparison of all terms</p>
         <div class="chart-wrap"><canvas id="barChart" aria-label="Bar chart comparing term frequency"></canvas></div>
       </div>
+      <div id="individual-charts-container"></div>
+      <div class="card">
+        <h2 class="card__title">Relative Share — Percentage Over Time</h2>
+        <p class="card__subtitle">Each term's share of total results per year (Google Scholar)</p>
+        <div class="chart-wrap"><canvas id="percentChart" aria-label="Percentage share chart"></canvas></div>
+      </div>
+      <div id="stats-container"></div>
       <div id="journal-charts-container"></div>
       <div class="card">
         <div class="btn-group">
@@ -239,7 +261,6 @@
     <section id="tab-scholar" class="tab-panel" role="tabpanel" aria-labelledby="btn-scholar">
       <h2 class="card__title">Google Scholar Result Counts</h2>
       <p class="card__subtitle">Click the link to open the exact Google Scholar search. Enter the "About X results" number shown at the top.</p>
-      <div id="scope-badge-scholar" style="margin-bottom:12px;"></div>
       <div id="scholar-tables"></div>
     </section>
 
@@ -247,7 +268,6 @@
     <section id="tab-journals" class="tab-panel" role="tabpanel" aria-labelledby="btn-journals">
       <h2 class="card__title">Journal-Specific Counts</h2>
       <p class="card__subtitle">For each term/journal/year combination, click the link to open Google Scholar filtered by source. Enter the result count.</p>
-      <div id="scope-badge-journals" style="margin-bottom:12px;"></div>
       <div id="journal-tables"></div>
     </section>
 
@@ -276,30 +296,6 @@
               <input id="cfg-year-end" type="number" min="1900" max="2030" value="2026"
                 style="margin-top:6px;padding:8px;border:1px solid var(--color-border-dark);border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:13px;width:100px;">
             </label>
-          </div>
-          <div style="margin-bottom:16px;">
-            <strong>Search Scope</strong>
-            <p style="font-size:12px;color:var(--color-text-muted);margin:4px 0 8px;">Controls where Google Scholar looks for your search terms. Changing this rebuilds all search links.</p>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
-                <input type="radio" name="cfg-scope" value="any" checked
-                  style="margin-top:3px;accent-color:var(--color-accent);">
-                <span><strong>Anywhere in article</strong> <span style="font-size:11px;color:var(--color-text-muted);">(default)</span><br>
-                <span style="font-size:12px;color:var(--color-text-muted);">Searches title, abstract, full text, and keywords</span></span>
-              </label>
-              <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
-                <input type="radio" name="cfg-scope" value="title"
-                  style="margin-top:3px;accent-color:var(--color-accent);">
-                <span><strong>Title only</strong><br>
-                <span style="font-size:12px;color:var(--color-text-muted);">Only counts articles with the term in the title</span></span>
-              </label>
-              <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
-                <input type="radio" name="cfg-scope" value="keywords"
-                  style="margin-top:3px;accent-color:var(--color-accent);">
-                <span><strong>Keywords</strong> <span style="font-size:11px;color:var(--color-text-muted);">(approximation)</span><br>
-                <span style="font-size:12px;color:var(--color-text-muted);">Uses <code>intitle:</code> + exact phrase to approximate keyword-level filtering. Note: Google Scholar has no dedicated keyword field — for precise keyword searches, use Scopus or Web of Science.</span></span>
-              </label>
-            </div>
           </div>
           <div class="btn-group">
             <button class="btn btn--primary" onclick="applySettings()">Apply &amp; Rebuild</button>
@@ -332,20 +328,7 @@
           Example: <code>"your term" source:"Your Journal Name"</code>.
           The links in this dashboard are pre-built for you.</p>
 
-          <p><strong>3. Search scope options:</strong><br>
-          You can change the search scope in <strong>Settings</strong> to control where Google Scholar
-          looks for your terms:<br>
-          — <strong>Anywhere in article</strong> (default): Searches title, abstract, full text, and keywords.
-          This gives the broadest count.<br>
-          — <strong>Title only</strong>: Only counts articles with the term in the title. Uses Google Scholar's
-          <code>as_occt=title</code> parameter. Yields much smaller but more focused counts.<br>
-          — <strong>Keywords (approx.)</strong>: Uses <code>allintitle:</code> as an approximation.
-          Google Scholar has no dedicated keyword field — for precise keyword-only searches, use
-          Scopus, Web of Science, or ERIC instead.<br>
-          — <em>Tip:</em> Collect data in one scope, export it, then switch scope and collect again
-          to compare across scopes.</p>
-
-          <p><strong>4. Alternative tools for more rigorous results:</strong><br>
+          <p><strong>3. Alternative tools for more rigorous results:</strong><br>
           — <strong>Scopus</strong> or <strong>Web of Science</strong>: Allow precise filtering by
           journal, year, and keyword. They also export as CSV.<br>
           — <strong>ERIC</strong> (<a href="https://eric.ed.gov" target="_blank" rel="noopener noreferrer">eric.ed.gov</a>):
@@ -355,14 +338,14 @@
           — <strong>Dimensions</strong> (<a href="https://app.dimensions.ai" target="_blank" rel="noopener noreferrer">dimensions.ai</a>):
           Free tier available.</p>
 
-          <p><strong>5. Important caveats:</strong><br>
+          <p><strong>4. Important caveats:</strong><br>
           — Google Scholar counts are approximate and can fluctuate.<br>
           — The <code>source:</code> filter in Google Scholar is not perfectly reliable.<br>
           — For publication-quality data, Scopus or Web of Science are preferred.<br>
           — Record the date you collected data, as counts change over time.<br>
           — Partial-year data will naturally show lower numbers.</p>
 
-          <p><strong>6. Interpreting your charts:</strong><br>
+          <p><strong>5. Interpreting your charts:</strong><br>
           — Line charts show trends and turning points.<br>
           — Bar charts make year-to-year comparison easier.<br>
           — Stacked area charts show how journals contribute to the total.<br>
@@ -403,14 +386,15 @@
     journals: ['Journal Name 1', 'Journal Name 2', 'Journal Name 3'],
     yearStart: 2011,
     yearEnd: 2026,
-    searchScope: 'any',
   };
 
   var scholarData = {};
   var journalData = {};
   var lineChart = null;
   var barChart = null;
+  var percentChart = null;
   var journalCharts = [];
+  var individualCharts = [];
 
   function getYears() {
     var years = [];
@@ -419,29 +403,10 @@
   }
 
   function scholarURL(term, year) {
-    var scope = CONFIG.searchScope || 'any';
-    if (scope === 'title') {
-      return 'https://scholar.google.com/scholar?as_q=&as_epq=' + encodeURIComponent(term) +
-        '&as_occt=title&as_ylo=' + year + '&as_yhi=' + year + '&as_vis=1';
-    }
-    if (scope === 'keywords') {
-      return 'https://scholar.google.com/scholar?q=allintitle:%22' + encodeURIComponent(term) +
-        '%22&as_ylo=' + year + '&as_yhi=' + year + '&as_vis=1';
-    }
     return 'https://scholar.google.com/scholar?q=%22' + encodeURIComponent(term) + '%22&as_ylo=' + year + '&as_yhi=' + year;
   }
 
   function journalURL(term, year, journal) {
-    var scope = CONFIG.searchScope || 'any';
-    if (scope === 'title') {
-      return 'https://scholar.google.com/scholar?as_q=&as_epq=' + encodeURIComponent(term) +
-        '&as_occt=title&as_publication=' + encodeURIComponent(journal) +
-        '&as_ylo=' + year + '&as_yhi=' + year + '&as_vis=1';
-    }
-    if (scope === 'keywords') {
-      return 'https://scholar.google.com/scholar?q=allintitle:%22' + encodeURIComponent(term) +
-        '%22+source:%22' + encodeURIComponent(journal) + '%22&as_ylo=' + year + '&as_yhi=' + year + '&as_vis=1';
-    }
     return 'https://scholar.google.com/scholar?q=%22' + encodeURIComponent(term) + '%22+source:%22' + encodeURIComponent(journal) + '%22&as_ylo=' + year + '&as_yhi=' + year;
   }
 
@@ -470,7 +435,6 @@
         CONFIG.journals = state.config.journals || CONFIG.journals;
         CONFIG.yearStart = state.config.yearStart || CONFIG.yearStart;
         CONFIG.yearEnd = state.config.yearEnd || CONFIG.yearEnd;
-        CONFIG.searchScope = state.config.searchScope || CONFIG.searchScope;
       }
       if (state.scholarData) scholarData = state.scholarData;
       if (state.journalData) journalData = state.journalData;
@@ -630,12 +594,65 @@
     container.innerHTML = html;
   }
 
-  // safe data access — || null treats 0 as null, so we use explicit null check
-  function getVal(obj, key) { return obj && obj[key] != null ? obj[key] : null; }
-  function getScholar(t, y) { return scholarData[t] ? getVal(scholarData[t], y) : null; }
-  function getJournal(t, j, y) { return journalData[t] && journalData[t][j] ? getVal(journalData[t][j], y) : null; }
+  // individual term charts (one card per term with line + bar combo)
+  function buildIndividualChartContainers() {
+    var container = document.getElementById('individual-charts-container');
+    var html = '';
+    CONFIG.terms.forEach(function(t, ti) {
+      html += '<div class="card">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
+        '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">' + escHtml(t) + '</span>' +
+        '<h2 class="card__title" style="font-size:18px;margin-bottom:0">— Google Scholar Trend</h2></div>' +
+        '<p class="card__subtitle">Individual trend line and yearly bar chart</p>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
+        '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indLine' + ti + '"></canvas></div></div>' +
+        '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indBar' + ti + '"></canvas></div></div>' +
+        '</div></div>';
+    });
+    container.innerHTML = html;
+  }
 
-  // charts
+  // summary statistics
+  function buildStatsContainer() {
+    var container = document.getElementById('stats-container');
+    var years = getYears();
+    var html = '<div class="card"><h2 class="card__title">Summary Statistics</h2>' +
+      '<p class="card__subtitle">Key metrics for each term based on Google Scholar data</p>' +
+      '<div class="stats-grid">';
+
+    CONFIG.terms.forEach(function(t, ti) {
+      var vals = years.map(function(y) { return scholarData[t] ? scholarData[t][y] : null; }).filter(function(v) { return v != null; });
+      var total = vals.reduce(function(a, b) { return a + b; }, 0);
+      var avg = vals.length > 0 ? Math.round(total / vals.length) : 0;
+      var max = vals.length > 0 ? Math.max.apply(null, vals) : 0;
+      var peakYear = '—';
+      if (vals.length > 0) {
+        years.forEach(function(y) {
+          if (scholarData[t] && scholarData[t][y] === max) peakYear = y;
+        });
+      }
+      // growth: compare first non-null to last non-null
+      var firstVal = null, lastVal = null;
+      years.forEach(function(y) {
+        var v = scholarData[t] ? scholarData[t][y] : null;
+        if (v != null) {
+          if (firstVal === null) firstVal = v;
+          lastVal = v;
+        }
+      });
+      var growth = (firstVal && lastVal && firstVal > 0) ? Math.round(((lastVal - firstVal) / firstVal) * 100) : null;
+      var growthStr = growth !== null ? (growth >= 0 ? '+' + growth + '%' : growth + '%') : '—';
+
+      html += '<div class="stat-card" style="border-left:3px solid ' + termColor(ti) + '">' +
+        '<div class="stat-card__label">' + escHtml(t) + '</div>' +
+        '<div class="stat-card__value" style="color:' + termColor(ti) + '">' + total.toLocaleString() + '</div>' +
+        '<div class="stat-card__detail">Avg/year: ' + avg.toLocaleString() + ' · Peak: ' + peakYear + ' (' + max.toLocaleString() + ')</div>' +
+        '<div class="stat-card__detail">Growth (first→last): ' + growthStr + '</div>' +
+        '</div>';
+    });
+    html += '</div></div>';
+    container.innerHTML = html;
+  }
   function chartOptions() {
     return {
       responsive: true,
@@ -649,30 +666,23 @@
   }
 
   function initCharts() {
-    if (typeof Chart === 'undefined') {
-      console.error('Chart.js library not loaded');
-      var containers = [document.getElementById('lineChart'), document.getElementById('barChart')];
-      containers.forEach(function(c) {
-        if (c && c.parentNode) {
-          c.parentNode.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-sans);color:var(--color-accent);font-size:14px;text-align:center;padding:20px;">' +
-            '⚠ Chart.js failed to load. Please check your internet connection and reload the page.</div>';
-        }
-      });
-      return;
-    }
     var years = getYears();
     if (lineChart) lineChart.destroy();
     if (barChart) barChart.destroy();
+    if (percentChart) percentChart.destroy();
     journalCharts.forEach(function(c) { if (c) c.destroy(); });
+    individualCharts.forEach(function(pair) { if (pair.line) pair.line.destroy(); if (pair.bar) pair.bar.destroy(); });
     journalCharts = [];
+    individualCharts = [];
 
+    // combined line chart
     lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
       type: 'line',
       data: {
         labels: years,
         datasets: CONFIG.terms.map(function(t, i) {
           return {
-            label: t, data: years.map(function(y) { return getScholar(t, y); }),
+            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
             borderColor: termColor(i), backgroundColor: termColorAlpha(i),
             tension: 0.3, pointRadius: 3, borderWidth: 2.5, spanGaps: true,
           };
@@ -681,13 +691,14 @@
       options: chartOptions(),
     });
 
+    // combined bar chart
     barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
       type: 'bar',
       data: {
         labels: years,
         datasets: CONFIG.terms.map(function(t, i) {
           return {
-            label: t, data: years.map(function(y) { return getScholar(t, y); }),
+            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
             backgroundColor: termColor(i) + 'cc', borderColor: termColor(i), borderWidth: 1, borderRadius: 3,
           };
         }),
@@ -695,17 +706,103 @@
       options: chartOptions(),
     });
 
+    // individual term charts (line + bar per term)
+    CONFIG.terms.forEach(function(t, ti) {
+      var data = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
+      var lineEl = document.getElementById('indLine' + ti);
+      var barEl = document.getElementById('indBar' + ti);
+      if (!lineEl || !barEl) return;
+
+      var indLine = new Chart(lineEl.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: [{
+            label: t, data: data,
+            borderColor: termColor(ti), backgroundColor: termColorAlpha(ti),
+            fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, spanGaps: true,
+          }],
+        },
+        options: chartOptions(),
+      });
+
+      var indBar = new Chart(barEl.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [{
+            label: t, data: data,
+            backgroundColor: termColor(ti) + 'cc', borderColor: termColor(ti), borderWidth: 1, borderRadius: 3,
+          }],
+        },
+        options: chartOptions(),
+      });
+
+      individualCharts[ti] = { line: indLine, bar: indBar };
+    });
+
+    // percentage share chart
+    var percentData = years.map(function(y) {
+      var totals = {};
+      var sum = 0;
+      CONFIG.terms.forEach(function(t) {
+        var v = scholarData[t] ? scholarData[t][y] || 0 : 0;
+        totals[t] = v;
+        sum += v;
+      });
+      var row = { year: y };
+      CONFIG.terms.forEach(function(t) {
+        row[t] = sum > 0 ? Math.round((totals[t] / sum) * 1000) / 10 : 0;
+      });
+      return row;
+    });
+
+    var pctEl = document.getElementById('percentChart');
+    if (pctEl) {
+      percentChart = new Chart(pctEl.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: CONFIG.terms.map(function(t, i) {
+            return {
+              label: t,
+              data: percentData.map(function(r) { return r[t]; }),
+              backgroundColor: termColor(i) + 'cc',
+              borderColor: termColor(i),
+              borderWidth: 1,
+            };
+          }),
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
+            tooltip: {
+              callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } }
+            },
+          },
+          scales: {
+            x: { stacked: true, ticks: { font: { family: "'DM Sans'", size: 11 } } },
+            y: { stacked: true, max: 100, ticks: { font: { family: "'DM Sans'", size: 11 }, callback: function(v) { return v + '%'; } } },
+          },
+        },
+      });
+    }
+
+    // journal breakdown charts (stacked area per term)
     CONFIG.terms.forEach(function(t, ti) {
       var opts = chartOptions();
       opts.scales.y.stacked = true;
-      journalCharts[ti] = new Chart(document.getElementById('journalChart' + ti).getContext('2d'), {
+      var el = document.getElementById('journalChart' + ti);
+      if (!el) return;
+      journalCharts[ti] = new Chart(el.getContext('2d'), {
         type: 'line',
         data: {
           labels: years,
           datasets: CONFIG.journals.map(function(j, ji) {
             return {
               label: j,
-              data: years.map(function(y) { return getJournal(t, j, y); }),
+              data: years.map(function(y) { return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null; }),
               borderColor: PALETTE[ji % PALETTE.length], backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
               fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2, spanGaps: true,
             };
@@ -714,29 +811,70 @@
         options: opts,
       });
     });
+
+    // also rebuild stats since they depend on data
+    buildStatsContainer();
   }
 
   function refreshCharts() {
     var years = getYears();
     CONFIG.terms.forEach(function(t, ti) {
-      var sData = years.map(function(y) { return getScholar(t, y); });
+      var sData = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
       if (lineChart && lineChart.data.datasets[ti]) lineChart.data.datasets[ti].data = sData;
       if (barChart && barChart.data.datasets[ti]) barChart.data.datasets[ti].data = sData;
+      // individual charts
+      if (individualCharts[ti]) {
+        if (individualCharts[ti].line && individualCharts[ti].line.data.datasets[0]) {
+          individualCharts[ti].line.data.datasets[0].data = sData;
+          individualCharts[ti].line.update();
+        }
+        if (individualCharts[ti].bar && individualCharts[ti].bar.data.datasets[0]) {
+          individualCharts[ti].bar.data.datasets[0].data = sData;
+          individualCharts[ti].bar.update();
+        }
+      }
     });
     if (lineChart) lineChart.update();
     if (barChart) barChart.update();
 
+    // percentage chart
+    if (percentChart) {
+      var pctData = years.map(function(y) {
+        var totals = {};
+        var sum = 0;
+        CONFIG.terms.forEach(function(t) {
+          var v = scholarData[t] ? scholarData[t][y] || 0 : 0;
+          totals[t] = v;
+          sum += v;
+        });
+        var row = {};
+        CONFIG.terms.forEach(function(t) {
+          row[t] = sum > 0 ? Math.round((totals[t] / sum) * 1000) / 10 : 0;
+        });
+        return row;
+      });
+      CONFIG.terms.forEach(function(t, ti) {
+        if (percentChart.data.datasets[ti]) {
+          percentChart.data.datasets[ti].data = pctData.map(function(r) { return r[t]; });
+        }
+      });
+      percentChart.update();
+    }
+
+    // journal charts
     CONFIG.terms.forEach(function(t, ti) {
       if (!journalCharts[ti]) return;
       CONFIG.journals.forEach(function(j, ji) {
         if (journalCharts[ti].data.datasets[ji]) {
           journalCharts[ti].data.datasets[ji].data = years.map(function(y) {
-            return getJournal(t, j, y);
+            return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null;
           });
         }
       });
       journalCharts[ti].update();
     });
+
+    buildStatsContainer();
   }
 
   // settings
@@ -745,8 +883,6 @@
     document.getElementById('cfg-journals').value = CONFIG.journals.join('\n');
     document.getElementById('cfg-year-start').value = CONFIG.yearStart;
     document.getElementById('cfg-year-end').value = CONFIG.yearEnd;
-    var radios = document.querySelectorAll('input[name="cfg-scope"]');
-    radios.forEach(function(r) { r.checked = (r.value === CONFIG.searchScope); });
   }
 
   function applySettings() {
@@ -763,8 +899,6 @@
     CONFIG.journals = journals;
     CONFIG.yearStart = yearStart;
     CONFIG.yearEnd = yearEnd;
-    var scopeRadio = document.querySelector('input[name="cfg-scope"]:checked');
-    CONFIG.searchScope = scopeRadio ? scopeRadio.value : 'any';
 
     initializeData();
     rebuildAll();
@@ -781,7 +915,6 @@
     CONFIG.journals = ['Journal Name 1', 'Journal Name 2', 'Journal Name 3'];
     CONFIG.yearStart = 2011;
     CONFIG.yearEnd = 2026;
-    CONFIG.searchScope = 'any';
     initializeData();
     rebuildAll();
     showToast('All data has been reset');
@@ -790,19 +923,18 @@
   // export / import
   function exportCSV() {
     var years = getYears();
-    var scopeLabel = (SCOPE_LABELS[CONFIG.searchScope] || SCOPE_LABELS.any).label;
-    var csv = 'Source,Term,Year,Count,SearchScope\n';
+    var csv = 'Source,Term,Year,Count\n';
     CONFIG.terms.forEach(function(t) {
       years.forEach(function(y) {
         var v = scholarData[t] && scholarData[t][y] != null ? scholarData[t][y] : '';
-        csv += 'Google Scholar,"' + t + '",' + y + ',' + v + ',"' + scopeLabel + '"\n';
+        csv += 'Google Scholar,"' + t + '",' + y + ',' + v + '\n';
       });
     });
     CONFIG.terms.forEach(function(t) {
       CONFIG.journals.forEach(function(j) {
         years.forEach(function(y) {
           var v = journalData[t] && journalData[t][j] && journalData[t][j][y] != null ? journalData[t][j][y] : '';
-          csv += '"' + j + '","' + t + '",' + y + ',' + v + ',"' + scopeLabel + '"\n';
+          csv += '"' + j + '","' + t + '",' + y + ',' + v + '\n';
         });
       });
     });
@@ -828,7 +960,6 @@
           CONFIG.journals = data.config.journals || CONFIG.journals;
           CONFIG.yearStart = data.config.yearStart || CONFIG.yearStart;
           CONFIG.yearEnd = data.config.yearEnd || CONFIG.yearEnd;
-          CONFIG.searchScope = data.config.searchScope || CONFIG.searchScope;
         }
         if (data.scholarData) scholarData = data.scholarData;
         if (data.journalData) journalData = data.journalData;
@@ -855,38 +986,15 @@
     URL.revokeObjectURL(a.href);
   }
 
-  // scope badge
-  var SCOPE_LABELS = {
-    any: { label: 'Anywhere in article', icon: '📄' },
-    title: { label: 'Title only', icon: '🔤' },
-    keywords: { label: 'Keywords (approx.)', icon: '🏷️' },
-  };
-
-  function renderScopeBadges() {
-    var scope = CONFIG.searchScope || 'any';
-    var info = SCOPE_LABELS[scope] || SCOPE_LABELS.any;
-    var badgeHtml = '<div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;' +
-      'background:var(--color-info-bg);border:1px solid var(--color-info-border);border-radius:20px;' +
-      'font-family:var(--font-sans);font-size:12px;">' +
-      '<span>' + info.icon + '</span>' +
-      '<span>Search scope: <strong>' + info.label + '</strong></span>' +
-      '<a href="#" onclick="switchTab(\'settings\');return false;" style="color:var(--color-accent);font-size:11px;margin-left:4px;">change</a>' +
-      '</div>';
-    var el1 = document.getElementById('scope-badge-scholar');
-    var el2 = document.getElementById('scope-badge-journals');
-    if (el1) el1.innerHTML = badgeHtml;
-    if (el2) el2.innerHTML = badgeHtml;
-  }
-
   // full rebuild
   function rebuildAll() {
     buildScholarTables();
     buildJournalTables();
     buildQuickLinks();
+    buildIndividualChartContainers();
     buildJournalChartContainers();
     initCharts();
     populateSettings();
-    renderScopeBadges();
   }
 
   // kick it off
