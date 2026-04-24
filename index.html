@@ -12,7 +12,6 @@
   <title>Bibliometric Research Dashboard</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
-    integrity="sha512-CQBSSt0Bm2MlDJMYbBFNUEoMBCpgYJ6Clz0HIEP4VIBfPz5WFMiyYAMBMZB3JMFhjGTaIcSQrYbUvYJo5SDNQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -492,11 +491,28 @@
     document.getElementById('btn-' + id).classList.add('tabs__btn--active');
     document.getElementById('btn-' + id).setAttribute('aria-selected', 'true');
     if (id === 'overview') {
+      destroyAllCharts();
       buildIndividualChartContainers();
       buildJournalChartContainers();
       initCharts();
     }
     if (id === 'settings') populateSettings();
+  }
+
+  function destroyAllCharts() {
+    try { if (lineChart) { lineChart.destroy(); } } catch(e) {}
+    lineChart = null;
+    try { if (barChart) { barChart.destroy(); } } catch(e) {}
+    barChart = null;
+    try { if (percentChart) { percentChart.destroy(); } } catch(e) {}
+    percentChart = null;
+    journalCharts.forEach(function(c) { try { if (c) c.destroy(); } catch(e) {} });
+    journalCharts = [];
+    individualCharts.forEach(function(p) {
+      try { if (p && p.line) p.line.destroy(); } catch(e) {}
+      try { if (p && p.bar) p.bar.destroy(); } catch(e) {}
+    });
+    individualCharts = [];
   }
 
   // data updates
@@ -671,152 +687,155 @@
 
   function initCharts() {
     var years = getYears();
-    if (lineChart) lineChart.destroy();
-    if (barChart) barChart.destroy();
-    if (percentChart) percentChart.destroy();
-    journalCharts.forEach(function(c) { if (c) c.destroy(); });
-    individualCharts.forEach(function(pair) { if (pair.line) pair.line.destroy(); if (pair.bar) pair.bar.destroy(); });
-    journalCharts = [];
-    individualCharts = [];
+    destroyAllCharts();
 
-    // combined line chart
-    lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: years,
-        datasets: CONFIG.terms.map(function(t, i) {
-          return {
-            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
-            borderColor: termColor(i), backgroundColor: termColorAlpha(i),
-            tension: 0.3, pointRadius: 3, borderWidth: 2.5, spanGaps: true,
-          };
-        }),
-      },
-      options: chartOptions(),
-    });
-
-    // combined bar chart
-    barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: years,
-        datasets: CONFIG.terms.map(function(t, i) {
-          return {
-            label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
-            backgroundColor: termColor(i) + 'cc', borderColor: termColor(i), borderWidth: 1, borderRadius: 3,
-          };
-        }),
-      },
-      options: chartOptions(),
-    });
-
-    // individual term charts (line + bar per term)
-    CONFIG.terms.forEach(function(t, ti) {
-      var data = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
-      var lineEl = document.getElementById('indLine' + ti);
-      var barEl = document.getElementById('indBar' + ti);
-      if (!lineEl || !barEl) return;
-
-      var indLine = new Chart(lineEl.getContext('2d'), {
+    try {
+      // combined line chart
+      lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
         type: 'line',
         data: {
           labels: years,
-          datasets: [{
-            label: t, data: data,
-            borderColor: termColor(ti), backgroundColor: termColorAlpha(ti),
-            fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, spanGaps: true,
-          }],
+          datasets: CONFIG.terms.map(function(t, i) {
+            return {
+              label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+              borderColor: termColor(i), backgroundColor: termColorAlpha(i),
+              tension: 0.3, pointRadius: 3, borderWidth: 2.5, spanGaps: true,
+            };
+          }),
         },
         options: chartOptions(),
       });
+    } catch(e) { console.error('lineChart error:', e); }
 
-      var indBar = new Chart(barEl.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: years,
-          datasets: [{
-            label: t, data: data,
-            backgroundColor: termColor(ti) + 'cc', borderColor: termColor(ti), borderWidth: 1, borderRadius: 3,
-          }],
-        },
-        options: chartOptions(),
-      });
-
-      individualCharts[ti] = { line: indLine, bar: indBar };
-    });
-
-    // percentage share chart
-    var percentData = years.map(function(y) {
-      var totals = {};
-      var sum = 0;
-      CONFIG.terms.forEach(function(t) {
-        var v = scholarData[t] ? scholarData[t][y] || 0 : 0;
-        totals[t] = v;
-        sum += v;
-      });
-      var row = { year: y };
-      CONFIG.terms.forEach(function(t) {
-        row[t] = sum > 0 ? Math.round((totals[t] / sum) * 1000) / 10 : 0;
-      });
-      return row;
-    });
-
-    var pctEl = document.getElementById('percentChart');
-    if (pctEl) {
-      percentChart = new Chart(pctEl.getContext('2d'), {
+    try {
+      // combined bar chart
+      barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
         type: 'bar',
         data: {
           labels: years,
           datasets: CONFIG.terms.map(function(t, i) {
             return {
-              label: t,
-              data: percentData.map(function(r) { return r[t]; }),
-              backgroundColor: termColor(i) + 'cc',
-              borderColor: termColor(i),
-              borderWidth: 1,
+              label: t, data: years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; }),
+              backgroundColor: termColor(i) + 'cc', borderColor: termColor(i), borderWidth: 1, borderRadius: 3,
             };
           }),
         },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
-            tooltip: {
-              callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } }
-            },
-          },
-          scales: {
-            x: { stacked: true, ticks: { font: { family: "'DM Sans'", size: 11 } } },
-            y: { stacked: true, max: 100, ticks: { font: { family: "'DM Sans'", size: 11 }, callback: function(v) { return v + '%'; } } },
-          },
-        },
+        options: chartOptions(),
       });
-    }
+    } catch(e) { console.error('barChart error:', e); }
 
-    // journal breakdown charts (stacked area per term)
+    // individual term charts
     CONFIG.terms.forEach(function(t, ti) {
-      var opts = chartOptions();
-      opts.scales.y.stacked = true;
-      var el = document.getElementById('journalChart' + ti);
-      if (!el) return;
-      journalCharts[ti] = new Chart(el.getContext('2d'), {
-        type: 'line',
-        data: {
-          labels: years,
-          datasets: CONFIG.journals.map(function(j, ji) {
-            return {
-              label: j,
-              data: years.map(function(y) { return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null; }),
-              borderColor: PALETTE[ji % PALETTE.length], backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
-              fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2, spanGaps: true,
-            };
-          }),
-        },
-        options: opts,
-      });
+      try {
+        var data = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
+        var lineEl = document.getElementById('indLine' + ti);
+        var barEl = document.getElementById('indBar' + ti);
+        if (!lineEl || !barEl) return;
+
+        var indLine = new Chart(lineEl.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: years,
+            datasets: [{
+              label: t, data: data,
+              borderColor: termColor(ti), backgroundColor: termColorAlpha(ti),
+              fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, spanGaps: true,
+            }],
+          },
+          options: chartOptions(),
+        });
+
+        var indBar = new Chart(barEl.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: years,
+            datasets: [{
+              label: t, data: data,
+              backgroundColor: termColor(ti) + 'cc', borderColor: termColor(ti), borderWidth: 1, borderRadius: 3,
+            }],
+          },
+          options: chartOptions(),
+        });
+
+        individualCharts[ti] = { line: indLine, bar: indBar };
+      } catch(e) { console.error('individualChart ' + ti + ' error:', e); }
     });
 
-    // also rebuild stats since they depend on data
+    // percentage share chart
+    try {
+      var percentData = years.map(function(y) {
+        var totals = {};
+        var sum = 0;
+        CONFIG.terms.forEach(function(t) {
+          var v = scholarData[t] ? scholarData[t][y] || 0 : 0;
+          totals[t] = v;
+          sum += v;
+        });
+        var row = {};
+        CONFIG.terms.forEach(function(t) {
+          row[t] = sum > 0 ? Math.round((totals[t] / sum) * 1000) / 10 : 0;
+        });
+        return row;
+      });
+
+      var pctEl = document.getElementById('percentChart');
+      if (pctEl) {
+        percentChart = new Chart(pctEl.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: years,
+            datasets: CONFIG.terms.map(function(t, i) {
+              return {
+                label: t,
+                data: percentData.map(function(r) { return r[t]; }),
+                backgroundColor: termColor(i) + 'cc',
+                borderColor: termColor(i),
+                borderWidth: 1,
+              };
+            }),
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
+              tooltip: {
+                callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } }
+              },
+            },
+            scales: {
+              x: { stacked: true, ticks: { font: { family: "'DM Sans'", size: 11 } } },
+              y: { stacked: true, max: 100, ticks: { font: { family: "'DM Sans'", size: 11 }, callback: function(v) { return v + '%'; } } },
+            },
+          },
+        });
+      }
+    } catch(e) { console.error('percentChart error:', e); }
+
+    // journal breakdown charts
+    CONFIG.terms.forEach(function(t, ti) {
+      try {
+        var opts = chartOptions();
+        opts.scales.y.stacked = true;
+        var el = document.getElementById('journalChart' + ti);
+        if (!el) return;
+        journalCharts[ti] = new Chart(el.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: years,
+            datasets: CONFIG.journals.map(function(j, ji) {
+              return {
+                label: j,
+                data: years.map(function(y) { return journalData[t] && journalData[t][j] ? journalData[t][j][y] || null : null; }),
+                borderColor: PALETTE[ji % PALETTE.length], backgroundColor: PALETTE_ALPHA[ji % PALETTE_ALPHA.length],
+                fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2, spanGaps: true,
+              };
+            }),
+          },
+          options: opts,
+        });
+      } catch(e) { console.error('journalChart ' + ti + ' error:', e); }
+    });
+
     buildStatsContainer();
   }
 
@@ -1002,12 +1021,27 @@
   }
 
   // kick it off
+  var APP_VERSION = 'v1.4';
   (function init() {
+    console.log('Bibliometric Dashboard ' + APP_VERSION + ' loading...');
+
+    // verify Chart.js loaded
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js failed to load!');
+      document.querySelector('.info-box').innerHTML =
+        '<strong style="color:#d9534f">Error:</strong> Chart.js failed to load from CDN. ' +
+        'Charts will not render. Check your internet connection or try disabling ad blockers.';
+      return;
+    }
+    console.log('Chart.js version:', Chart.version);
+
     var loaded = loadState();
     initializeData();
     if (!loaded) saveState();
+    console.log('Data loaded:', loaded, 'Terms:', CONFIG.terms.length);
     rebuildAll();
-    updateStatus('Loaded');
+    console.log('Init complete. Charts created:', !!lineChart, !!barChart);
+    updateStatus('Loaded ' + APP_VERSION);
   })();
   </script>
 </body>
