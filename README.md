@@ -4,9 +4,7 @@ A simple browser-based tool for tracking how often specific terms show up in aca
 
 It's a single HTML file. No install, no server, no Node.js — just download and open in your browser.
 
-**[Try the live demo here](https://ia-papastef.github.io/simpistic-bibliometric-dashboard/)**
-
-![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+**[Demo here](https://ia-papastef.github.io/simpistic-bibliometric-dashboard/)**
 
 ## Why this exists
 
