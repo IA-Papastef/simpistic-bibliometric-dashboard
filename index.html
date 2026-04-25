@@ -90,6 +90,7 @@
     .card {
       background: var(--color-surface); border-radius: var(--radius-lg);
       padding: 28px; box-shadow: var(--shadow-card); margin-bottom: 20px;
+      overflow: visible;
     }
     .card__title { font-family: var(--font-serif); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     .card__subtitle {
@@ -154,7 +155,7 @@
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .btn--dl { margin-top: 8px; font-size: 11px; padding: 5px 12px; }
 
-    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; }
+    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; padding-left: 10px; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
     .stats-grid {
@@ -683,7 +684,7 @@
     return {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { left: 10, right: 20, top: 10, bottom: 10 } },
+      layout: { padding: { left: 25, right: 20, top: 10, bottom: 10 } },
       plugins: { legend: { labels: { font: { family: "'DM Sans'", size: 11 } } } },
       scales: {
         x: { ticks: { font: { family: "'DM Sans'", size: 11 } } },
