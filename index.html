@@ -1095,16 +1095,8 @@
     initializeData();
     if (!loaded) saveState();
     console.log('Data loaded:', loaded, 'Terms:', CONFIG.terms.length);
-    var startCharts = function() {
-      rebuildAll();
-      setTimeout(function() { refreshCharts(); }, 100);
-      console.log('Init complete. Charts created:', !!lineChart, !!barChart);
-    };
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(startCharts).catch(startCharts);
-    } else {
-      startCharts();
-    }
+    rebuildAll();
+    console.log('Init complete. Charts created:', !!lineChart, !!barChart);
     updateStatus('Loaded ' + APP_VERSION);
   })();
   </script>
