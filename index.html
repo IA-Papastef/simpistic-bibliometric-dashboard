@@ -150,6 +150,7 @@
     .btn--outline { background: transparent; border: 1px solid var(--color-border-dark); color: var(--color-text); }
     .btn--outline:hover { background: var(--color-border); }
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .btn--dl { margin-top: 8px; font-size: 11px; padding: 5px 12px; }
 
     .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
@@ -233,23 +234,27 @@
         <h2 class="card__title">Google Scholar — All Terms Over Time</h2>
         <p class="card__subtitle">Yearly result counts for each search term across all of Google Scholar</p>
         <div class="chart-wrap"><canvas id="lineChart" aria-label="Line chart of term frequency over time"></canvas></div>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart('lineChart', 'Google Scholar — All Terms Over Time')">Download PNG</button>
       </div>
       <div class="card">
         <h2 class="card__title">Comparative Bar Chart — Per Year</h2>
         <p class="card__subtitle">Side-by-side comparison of all terms</p>
         <div class="chart-wrap"><canvas id="barChart" aria-label="Bar chart comparing term frequency"></canvas></div>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart('barChart', 'Comparative Bar Chart — Per Year')">Download PNG</button>
       </div>
       <div id="individual-charts-container"></div>
       <div class="card">
         <h2 class="card__title">Relative Share — Percentage Over Time</h2>
         <p class="card__subtitle">Each term's share of total results per year (Google Scholar)</p>
         <div class="chart-wrap"><canvas id="percentChart" aria-label="Percentage share chart"></canvas></div>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart('percentChart', 'Relative Share — Percentage Over Time')">Download PNG</button>
       </div>
       <div id="stats-container"></div>
       <div id="journal-charts-container"></div>
       <div class="card">
         <div class="btn-group">
-          <button class="btn btn--primary" onclick="exportCSV()">Export Data as CSV</button>
+          <button class="btn btn--primary" onclick="downloadAllCharts()">Download All Charts (PNG)</button>
+          <button class="btn btn--outline" onclick="exportCSV()">Export Data as CSV</button>
           <button class="btn btn--outline" onclick="exportJSON()">Export as JSON</button>
           <button class="btn btn--outline" onclick="window.print()">Print Charts</button>
         </div>
@@ -609,7 +614,8 @@
         '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">' + escHtml(t) + '</span>' +
         '<h2 class="card__title" style="font-size:18px;margin-bottom:0">by Journal</h2></div>' +
         '<p class="card__subtitle">Breakdown across the target journals</p>' +
-        '<div class="chart-wrap"><canvas id="journalChart' + ti + '" aria-label="Journal breakdown for ' + escHtml(t) + '"></canvas></div></div>';
+        '<div class="chart-wrap"><canvas id="journalChart' + ti + '" aria-label="Journal breakdown for ' + escHtml(t) + '"></canvas></div>' +
+        '<button class="btn btn--outline btn--dl" onclick="downloadChart(\'journalChart' + ti + '\', \'' + escAttr(t) + ' — by Journal\')">Download PNG</button></div>';
     });
     container.innerHTML = html;
   }
@@ -627,7 +633,9 @@
         '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
         '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indLine' + ti + '"></canvas></div></div>' +
         '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indBar' + ti + '"></canvas></div></div>' +
-        '</div></div>';
+        '</div>' +
+        '<div class="btn-group"><button class="btn btn--outline btn--dl" onclick="downloadChart(\'indLine' + ti + '\', \'' + escAttr(t) + ' — Line Trend\')">Download Line PNG</button>' +
+        '<button class="btn btn--outline btn--dl" onclick="downloadChart(\'indBar' + ti + '\', \'' + escAttr(t) + ' — Bar Chart\')">Download Bar PNG</button></div></div>';
     });
     container.innerHTML = html;
   }
@@ -944,6 +952,77 @@
   }
 
   // export / import
+  // chart image download - renders at 2x resolution with title
+  function downloadChart(canvasId, title) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) { showToast('Chart not found'); return; }
+
+    var scale = 2;
+    var padding = 60;
+    var titleHeight = 50;
+    var w = canvas.width * scale;
+    var h = canvas.height * scale;
+
+    var exp = document.createElement('canvas');
+    exp.width = w;
+    exp.height = h + titleHeight;
+    var ctx = exp.getContext('2d');
+
+    // white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, exp.width, exp.height);
+
+    // title
+    ctx.fillStyle = '#2a2520';
+    ctx.font = 'bold ' + (16 * scale) + 'px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, exp.width / 2, 32 * scale);
+
+    // draw chart below title
+    ctx.drawImage(canvas, 0, titleHeight, w, h);
+
+    var link = document.createElement('a');
+    var filename = title.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+$/, '') + '.png';
+    link.download = filename;
+    link.href = exp.toDataURL('image/png', 1.0);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Downloaded: ' + filename);
+  }
+
+  function downloadAllCharts() {
+    var charts = [];
+
+    // static charts
+    if (document.getElementById('lineChart')) charts.push({ id: 'lineChart', title: 'Google Scholar — All Terms Over Time' });
+    if (document.getElementById('barChart')) charts.push({ id: 'barChart', title: 'Comparative Bar Chart — Per Year' });
+
+    // individual term charts
+    CONFIG.terms.forEach(function(t, ti) {
+      if (document.getElementById('indLine' + ti)) charts.push({ id: 'indLine' + ti, title: t + ' — Line Trend' });
+      if (document.getElementById('indBar' + ti)) charts.push({ id: 'indBar' + ti, title: t + ' — Bar Chart' });
+    });
+
+    // percentage chart
+    if (document.getElementById('percentChart')) charts.push({ id: 'percentChart', title: 'Relative Share — Percentage Over Time' });
+
+    // journal charts
+    CONFIG.terms.forEach(function(t, ti) {
+      if (document.getElementById('journalChart' + ti)) charts.push({ id: 'journalChart' + ti, title: t + ' — by Journal' });
+    });
+
+    if (charts.length === 0) { showToast('No charts to download'); return; }
+
+    // download each with a small delay so browser doesn't block them
+    var delay = 0;
+    charts.forEach(function(c) {
+      setTimeout(function() { downloadChart(c.id, c.title); }, delay);
+      delay += 400;
+    });
+    showToast('Downloading ' + charts.length + ' charts...');
+  }
+
   function exportCSV() {
     var years = getYears();
     var csv = 'Source,Term,Year,Count\n';
