@@ -155,7 +155,8 @@
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .btn--dl { margin-top: 8px; font-size: 11px; padding: 5px 12px; }
 
-    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; margin-left: 0; overflow: visible; }
+    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; overflow: visible; }
+    .chart-wrap canvas { display: block; width: 100% !important; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
     .stats-grid {
@@ -680,23 +681,25 @@
     html += '</div></div>';
     container.innerHTML = html;
   }
+  function reserveYAxisWidth(scale) {
+    // Chart.js can measure tick labels before the webfont is ready, which may
+    // make large values like 40,000 render partly outside the canvas. Keeping a
+    // fixed minimum width for the y-axis makes the labels fit both on screen and
+    // in exported PNGs.
+    scale.width = Math.max(scale.width, 78);
+  }
+
   function chartOptions() {
     return {
       responsive: true,
       maintainAspectRatio: false,
-      // Reserve a fixed left gutter so large y-axis labels (for example 40,000)
-      // have enough room both in-browser and in downloaded PNG screenshots.
-      layout: { padding: { left: 12, right: 24, top: 10, bottom: 10 } },
+      layout: { padding: { left: 8, right: 20, top: 10, bottom: 10 } },
       plugins: { legend: { labels: { font: { family: "'DM Sans'", size: 11 } } } },
       scales: {
         x: { ticks: { font: { family: "'DM Sans'", size: 11 } } },
         y: {
-          afterFit: function(scale) { scale.width = Math.max(scale.width, 78); },
-          ticks: {
-            font: { family: "'DM Sans'", size: 11 },
-            padding: 8,
-            callback: function(value) { return Number(value).toLocaleString(); }
-          },
+          afterFit: reserveYAxisWidth,
+          ticks: { font: { family: "'DM Sans'", size: 11 }, padding: 8 },
           beginAtZero: true,
         },
       },
@@ -801,7 +804,6 @@
           },
           options: {
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { left: 12, right: 24, top: 10, bottom: 10 } },
             plugins: {
               legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
               tooltip: {
@@ -813,8 +815,8 @@
               y: {
                 stacked: true,
                 max: 100,
-                afterFit: function(scale) { scale.width = Math.max(scale.width, 58); },
-                ticks: { font: { family: "'DM Sans'", size: 11 }, padding: 8, callback: function(v) { return v + '%'; } }
+                afterFit: reserveYAxisWidth,
+                ticks: { font: { family: "'DM Sans'", size: 11 }, padding: 8, callback: function(v) { return v + '%'; } },
               },
             },
           },
@@ -1095,8 +1097,16 @@
     initializeData();
     if (!loaded) saveState();
     console.log('Data loaded:', loaded, 'Terms:', CONFIG.terms.length);
-    rebuildAll();
-    console.log('Init complete. Charts created:', !!lineChart, !!barChart);
+    var startCharts = function() {
+      rebuildAll();
+      setTimeout(function() { refreshCharts(); }, 100);
+      console.log('Init complete. Charts created:', !!lineChart, !!barChart);
+    };
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(startCharts).catch(startCharts);
+    } else {
+      startCharts();
+    }
     updateStatus('Loaded ' + APP_VERSION);
   })();
   </script>
