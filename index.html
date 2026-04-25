@@ -155,7 +155,7 @@
     .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .btn--dl { margin-top: 8px; font-size: 11px; padding: 5px 12px; }
 
-    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; margin-left: 20px; }
+    .chart-wrap { position: relative; height: 380px; margin-bottom: 10px; margin-left: 0; overflow: visible; }
     @media (max-width: 640px) { .chart-wrap { height: 280px; } }
 
     .stats-grid {
@@ -684,11 +684,21 @@
     return {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { left: 50, right: 20, top: 10, bottom: 10 } },
+      // Reserve a fixed left gutter so large y-axis labels (for example 40,000)
+      // have enough room both in-browser and in downloaded PNG screenshots.
+      layout: { padding: { left: 12, right: 24, top: 10, bottom: 10 } },
       plugins: { legend: { labels: { font: { family: "'DM Sans'", size: 11 } } } },
       scales: {
         x: { ticks: { font: { family: "'DM Sans'", size: 11 } } },
-        y: { ticks: { font: { family: "'DM Sans'", size: 11 } }, beginAtZero: true },
+        y: {
+          afterFit: function(scale) { scale.width = Math.max(scale.width, 78); },
+          ticks: {
+            font: { family: "'DM Sans'", size: 11 },
+            padding: 8,
+            callback: function(value) { return Number(value).toLocaleString(); }
+          },
+          beginAtZero: true,
+        },
       },
     };
   }
@@ -791,6 +801,7 @@
           },
           options: {
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { left: 12, right: 24, top: 10, bottom: 10 } },
             plugins: {
               legend: { labels: { font: { family: "'DM Sans'", size: 11 } } },
               tooltip: {
@@ -799,7 +810,12 @@
             },
             scales: {
               x: { stacked: true, ticks: { font: { family: "'DM Sans'", size: 11 } } },
-              y: { stacked: true, max: 100, ticks: { font: { family: "'DM Sans'", size: 11 }, callback: function(v) { return v + '%'; } } },
+              y: {
+                stacked: true,
+                max: 100,
+                afterFit: function(scale) { scale.width = Math.max(scale.width, 58); },
+                ticks: { font: { family: "'DM Sans'", size: 11 }, padding: 8, callback: function(v) { return v + '%'; } }
+              },
             },
           },
         });
