@@ -631,11 +631,8 @@
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
         '<span class="chip" style="background:' + termColor(ti) + '18;color:' + termColor(ti) + '">' + escHtml(t) + '</span>' +
         '<h2 class="card__title" style="font-size:18px;margin-bottom:0">— Google Scholar Trend</h2></div>' +
-        '<p class="card__subtitle">Individual trend line and yearly bar chart</p>' +
-        '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
-        '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indLine' + ti + '"></canvas></div></div>' +
-        '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indBar' + ti + '"></canvas></div></div>' +
-        '</div>' +
+        '<p class="card__subtitle">Individual trend line</p>' +
+        '<div class="chart-wrap"><canvas id="indLine' + ti + '"></canvas></div>' +
         '<button class="btn btn--outline btn--dl" onclick="downloadChart(this, \'' + escAttr(t) + ' — Google Scholar Trend\')">Download PNG</button></div>';
     });
     container.innerHTML = html;
@@ -739,8 +736,7 @@
       try {
         var data = years.map(function(y) { return scholarData[t] ? scholarData[t][y] || null : null; });
         var lineEl = document.getElementById('indLine' + ti);
-        var barEl = document.getElementById('indBar' + ti);
-        if (!lineEl || !barEl) return;
+        if (!lineEl) return;
 
         var indLine = new Chart(lineEl.getContext('2d'), {
           type: 'line',
@@ -755,19 +751,7 @@
           options: chartOptions(),
         });
 
-        var indBar = new Chart(barEl.getContext('2d'), {
-          type: 'bar',
-          data: {
-            labels: years,
-            datasets: [{
-              label: t, data: data,
-              backgroundColor: termColor(ti) + 'cc', borderColor: termColor(ti), borderWidth: 1, borderRadius: 3,
-            }],
-          },
-          options: chartOptions(),
-        });
-
-        individualCharts[ti] = { line: indLine, bar: indBar };
+        individualCharts[ti] = { line: indLine };
       } catch(e) { console.error('individualChart ' + ti + ' error:', e); }
     });
 
@@ -860,10 +844,6 @@
         if (individualCharts[ti].line && individualCharts[ti].line.data.datasets[0]) {
           individualCharts[ti].line.data.datasets[0].data = sData;
           individualCharts[ti].line.update();
-        }
-        if (individualCharts[ti].bar && individualCharts[ti].bar.data.datasets[0]) {
-          individualCharts[ti].bar.data.datasets[0].data = sData;
-          individualCharts[ti].bar.update();
         }
       }
     });
