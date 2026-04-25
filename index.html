@@ -13,6 +13,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,20 +236,20 @@
         <h2 class="card__title">Google Scholar — All Terms Over Time</h2>
         <p class="card__subtitle">Yearly result counts for each search term across all of Google Scholar</p>
         <div class="chart-wrap"><canvas id="lineChart" aria-label="Line chart of term frequency over time"></canvas></div>
-        <button class="btn btn--outline btn--dl" onclick="downloadChart('lineChart', 'Google Scholar — All Terms Over Time')">Download PNG</button>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart(this, 'Google Scholar — All Terms Over Time')">Download PNG</button>
       </div>
       <div class="card">
         <h2 class="card__title">Comparative Bar Chart — Per Year</h2>
         <p class="card__subtitle">Side-by-side comparison of all terms</p>
         <div class="chart-wrap"><canvas id="barChart" aria-label="Bar chart comparing term frequency"></canvas></div>
-        <button class="btn btn--outline btn--dl" onclick="downloadChart('barChart', 'Comparative Bar Chart — Per Year')">Download PNG</button>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart(this, 'Comparative Bar Chart — Per Year')">Download PNG</button>
       </div>
       <div id="individual-charts-container"></div>
       <div class="card">
         <h2 class="card__title">Relative Share — Percentage Over Time</h2>
         <p class="card__subtitle">Each term's share of total results per year (Google Scholar)</p>
         <div class="chart-wrap"><canvas id="percentChart" aria-label="Percentage share chart"></canvas></div>
-        <button class="btn btn--outline btn--dl" onclick="downloadChart('percentChart', 'Relative Share — Percentage Over Time')">Download PNG</button>
+        <button class="btn btn--outline btn--dl" onclick="downloadChart(this, 'Relative Share — Percentage Over Time')">Download PNG</button>
       </div>
       <div id="stats-container"></div>
       <div id="journal-charts-container"></div>
@@ -615,7 +617,7 @@
         '<h2 class="card__title" style="font-size:18px;margin-bottom:0">by Journal</h2></div>' +
         '<p class="card__subtitle">Breakdown across the target journals</p>' +
         '<div class="chart-wrap"><canvas id="journalChart' + ti + '" aria-label="Journal breakdown for ' + escHtml(t) + '"></canvas></div>' +
-        '<button class="btn btn--outline btn--dl" onclick="downloadChart(\'journalChart' + ti + '\', \'' + escAttr(t) + ' — by Journal\')">Download PNG</button></div>';
+        '<button class="btn btn--outline btn--dl" onclick="downloadChart(this, \'' + escAttr(t) + ' — by Journal\')">Download PNG</button></div>';
     });
     container.innerHTML = html;
   }
@@ -634,8 +636,7 @@
         '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indLine' + ti + '"></canvas></div></div>' +
         '<div style="flex:1;min-width:280px;"><div class="chart-wrap chart-wrap--sm"><canvas id="indBar' + ti + '"></canvas></div></div>' +
         '</div>' +
-        '<div class="btn-group"><button class="btn btn--outline btn--dl" onclick="downloadChart(\'indLine' + ti + '\', \'' + escAttr(t) + ' — Line Trend\')">Download Line PNG</button>' +
-        '<button class="btn btn--outline btn--dl" onclick="downloadChart(\'indBar' + ti + '\', \'' + escAttr(t) + ' — Bar Chart\')">Download Bar PNG</button></div></div>';
+        '<button class="btn btn--outline btn--dl" onclick="downloadChart(this, \'' + escAttr(t) + ' — Google Scholar Trend\')">Download PNG</button></div>';
     });
     container.innerHTML = html;
   }
@@ -952,78 +953,53 @@
   }
 
   // export / import
-  // chart image download - captures at native screen resolution, adds title
-  function downloadChart(canvasId, title) {
-    var canvas = document.getElementById(canvasId);
-    if (!canvas) { showToast('Chart not found'); return; }
+  // chart image download - screenshots the entire card element like the browser renders it
+  function downloadChart(btn, title) {
+    var card = btn.closest('.card');
+    if (!card) { showToast('Card not found'); return; }
 
-    // canvas.width/height are already at devicePixelRatio (set by Chart.js)
-    // so we just use them as-is — same quality as a screenshot
-    var w = canvas.width;
-    var h = canvas.height;
-    var dpr = window.devicePixelRatio || 1;
-    var titleH = Math.round(60 * dpr);
-    var pad = Math.round(20 * dpr);
+    // temporarily hide the download button itself
+    btn.style.display = 'none';
 
-    var exp = document.createElement('canvas');
-    exp.width = w + pad * 2;
-    exp.height = h + titleH + pad;
-    var ctx = exp.getContext('2d');
+    // also hide any btn-group inside the card
+    var btnGroups = card.querySelectorAll('.btn-group');
+    btnGroups.forEach(function(g) { g.style.display = 'none'; });
 
-    // white background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, exp.width, exp.height);
+    html2canvas(card, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    }).then(function(canvas) {
+      var link = document.createElement('a');
+      var filename = title.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+$/, '') + '.png';
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-    // title text
-    ctx.fillStyle = '#2a2520';
-    ctx.font = 'bold ' + Math.round(16 * dpr) + 'px DM Sans, Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(title, exp.width / 2, titleH - Math.round(15 * dpr));
-
-    // draw chart at native resolution — no scaling
-    ctx.drawImage(canvas, pad, titleH);
-
-    // download
-    var link = document.createElement('a');
-    var filename = title.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+$/, '') + '.png';
-    link.download = filename;
-    link.href = exp.toDataURL('image/png', 1.0);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast('Downloaded: ' + filename);
+      // restore buttons
+      btn.style.display = '';
+      btnGroups.forEach(function(g) { g.style.display = ''; });
+      showToast('Downloaded: ' + filename);
+    }).catch(function(err) {
+      btn.style.display = '';
+      btnGroups.forEach(function(g) { g.style.display = ''; });
+      console.error('Download error:', err);
+      showToast('Download failed — try a screenshot instead');
+    });
   }
 
   function downloadAllCharts() {
-    var charts = [];
-
-    // static charts
-    if (document.getElementById('lineChart')) charts.push({ id: 'lineChart', title: 'Google Scholar — All Terms Over Time' });
-    if (document.getElementById('barChart')) charts.push({ id: 'barChart', title: 'Comparative Bar Chart — Per Year' });
-
-    // individual term charts
-    CONFIG.terms.forEach(function(t, ti) {
-      if (document.getElementById('indLine' + ti)) charts.push({ id: 'indLine' + ti, title: t + ' — Line Trend' });
-      if (document.getElementById('indBar' + ti)) charts.push({ id: 'indBar' + ti, title: t + ' — Bar Chart' });
-    });
-
-    // percentage chart
-    if (document.getElementById('percentChart')) charts.push({ id: 'percentChart', title: 'Relative Share — Percentage Over Time' });
-
-    // journal charts
-    CONFIG.terms.forEach(function(t, ti) {
-      if (document.getElementById('journalChart' + ti)) charts.push({ id: 'journalChart' + ti, title: t + ' — by Journal' });
-    });
-
-    if (charts.length === 0) { showToast('No charts to download'); return; }
-
-    // download each with a small delay so browser doesn't block them
+    var buttons = document.querySelectorAll('.btn--dl');
+    if (buttons.length === 0) { showToast('No charts to download'); return; }
     var delay = 0;
-    charts.forEach(function(c) {
-      setTimeout(function() { downloadChart(c.id, c.title); }, delay);
-      delay += 400;
+    buttons.forEach(function(btn) {
+      setTimeout(function() { btn.click(); }, delay);
+      delay += 1500;
     });
-    showToast('Downloading ' + charts.length + ' charts...');
+    showToast('Downloading ' + buttons.length + ' charts...');
   }
 
   function exportCSV() {
@@ -1103,7 +1079,7 @@
   }
 
   // kick it off
-  var APP_VERSION = 'v1.5';
+  var APP_VERSION = 'v1.6';
   (function init() {
     console.log('Bibliometric Dashboard ' + APP_VERSION + ' loading...');
 
